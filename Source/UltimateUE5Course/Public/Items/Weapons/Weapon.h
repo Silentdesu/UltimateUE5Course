@@ -17,6 +17,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE UBoxComponent* GetBoxComponent() const { return BoxComponent; }
 
+public:
+
+	TArray<AActor*> IgnoreActors;
+
 protected:
 	
 	virtual void BeginPlay() override;

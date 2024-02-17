@@ -20,13 +20,13 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual void GetHit(const FVector& ImpactPoint) override;
 	
 protected:
 
 	virtual void BeginPlay() override;
 	void PlayHitReactMontage(const FName& SectionName) const;
+	void GetDirectionalHit(const FVector& ImpactPoint) const;
 
 private:
 	

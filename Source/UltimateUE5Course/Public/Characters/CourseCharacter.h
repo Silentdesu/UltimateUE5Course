@@ -57,7 +57,7 @@ protected:
 	void PlayEquipMontage(const FName& SectionName) const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollision(ECollisionEnabled::Type Type);
+	void SetWeaponCollision(const ECollisionEnabled::Type Type);
 	
 private:
 	

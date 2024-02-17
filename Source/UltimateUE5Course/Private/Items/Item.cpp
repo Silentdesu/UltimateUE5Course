@@ -46,7 +46,10 @@ void AItem::Tick(float DeltaTime)
 void AItem::Equip(USceneComponent* Parent, FName InSocketName)
 {
 	AttachMeshToSocket(Parent, InSocketName);
+	Holder = Parent->GetAttachParentActor();
 	State = EItemState::EIS_Equipped;
+
+	UE_LOG(LogTemp, Log, TEXT("Owner: %s"), *Holder->GetName());
 
 	if (EquipSFX)
 	{

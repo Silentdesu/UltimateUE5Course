@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AActor* Holder;
+
 	EItemState State = EItemState::EIS_Hovering;
 
 private:

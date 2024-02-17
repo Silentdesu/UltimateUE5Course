@@ -164,10 +164,11 @@ void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const
 	}
 }
 
-void ACourseCharacter::SetWeaponCollision(ECollisionEnabled::Type Type)
+void ACourseCharacter::SetWeaponCollision(const ECollisionEnabled::Type Type)
 {
 	if (EquippedWeapon && EquippedWeapon->GetBoxComponent())
 	{
 		EquippedWeapon->GetBoxComponent()->SetCollisionEnabled(Type);
+		EquippedWeapon->IgnoreActors.Empty();
 	}
 }
