@@ -35,4 +35,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UAnimInstance* AnimInstance;
+
+	UPROPERTY(EditAnywhere, Category = "Sounds")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	UParticleSystem* HitParticle;
 };
