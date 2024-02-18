@@ -65,8 +65,9 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		if (IHitable* Hitable = Cast<IHitable>(HitResult.GetActor()))
 		{
-			Hitable->GetHit(HitResult.ImpactPoint);
+			Hitable->Execute_GetHit(HitResult.GetActor(), HitResult.ImpactPoint);
 		}
 		IgnoreActors.AddUnique(HitResult.GetActor());
+		CreateFields(HitResult.ImpactPoint);
 	}
 }
