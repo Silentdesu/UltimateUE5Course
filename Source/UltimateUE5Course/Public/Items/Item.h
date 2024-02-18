@@ -22,7 +22,7 @@ public:
 	AItem();
 
 	virtual void Tick(float DeltaTime) override;
-	void Equip(USceneComponent* Parent, FName InSocketName);
+	virtual void Equip(USceneComponent* Parent, FName InSocketName);
 	void AttachMeshToSocket(USceneComponent* Parent, FName InSocketName);
 
 protected:
@@ -53,8 +53,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* EquipSFX;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AActor* Holder;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* EmbersEffect;
 
 	EItemState State = EItemState::EIS_Hovering;
 
@@ -62,7 +68,4 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime;
-
-	UPROPERTY(EditDefaultsOnly)
-	USoundBase* EquipSFX;
 };

@@ -6,6 +6,8 @@
 #include "BreakableProp.generated.h"
 
 class UGeometryCollectionComponent;
+class UCapsuleComponent;
+class ATreasure;
 
 UCLASS()
 class ULTIMATEUE5COURSE_API ABreakableProp : public AActor, public IHitable
@@ -24,4 +26,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UGeometryCollectionComponent* GeometryCollectionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCapsuleComponent* CapsuleComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Pickup")
+	TArray<TSubclassOf<ATreasure>> Treasures;
+
+	bool bHasBroken = false;
 };

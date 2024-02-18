@@ -20,6 +20,7 @@ public:
 public:
 
 	TArray<AActor*> IgnoreActors;
+	virtual void Equip(USceneComponent* Parent, FName InSocketName) override;
 
 protected:
 	

@@ -2,7 +2,7 @@
 #include "DrawDebugHelpers.h"
 #include "Characters/CourseCharacter.h"
 #include "Components/SphereComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 AItem::AItem()
 {
@@ -10,10 +10,14 @@ AItem::AItem()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	SetRootComponent(MeshComponent);
+	MeshComponent->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	SphereComponent->InitSphereRadius(300.0F);
-	SphereComponent->SetupAttachment(RootComponent);
+	SphereComponent->SetupAttachment(GetRootComponent());
+
+	EmbersEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EmbersEffect"));
+	EmbersEffect->SetupAttachment(GetRootComponent());
 }
 
 void AItem::BeginPlay()
@@ -28,13 +32,6 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (GEngine != nullptr)
-	{
-		const FString Name = GetName();
-		const FString Message = FString::Printf(TEXT("%s [%f ms]"), *Name, DeltaTime);
-		GEngine->AddOnScreenDebugMessage(0, 30.0f, FColor::Cyan, Message);
-	}
-
 	RunningTime += DeltaTime;
 
 	if (State == EItemState::EIS_Hovering)
@@ -45,21 +42,6 @@ void AItem::Tick(float DeltaTime)
 
 void AItem::Equip(USceneComponent* Parent, FName InSocketName)
 {
-	AttachMeshToSocket(Parent, InSocketName);
-	Holder = Parent->GetAttachParentActor();
-	State = EItemState::EIS_Equipped;
-
-	UE_LOG(LogTemp, Log, TEXT("Owner: %s"), *Holder->GetName());
-
-	if (EquipSFX)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, EquipSFX, GetActorLocation());
-	}
-
-	if (SphereComponent)
-	{
-		SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
 }
 
 void AItem::AttachMeshToSocket(USceneComponent* Parent, FName InSocketName)
