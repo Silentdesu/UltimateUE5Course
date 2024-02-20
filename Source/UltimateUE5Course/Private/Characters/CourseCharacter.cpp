@@ -111,7 +111,7 @@ void ACourseCharacter::PerformEquip()
 {
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
 	{
-		Weapon->Equip(GetMesh(), EquipmentSocketName);
+		Weapon->Equip(GetMesh(), EquipmentSocketName, this, this);
 		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 		OverlappingItem = nullptr;
 		EquippedWeapon = Weapon;

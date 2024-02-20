@@ -22,7 +22,6 @@ public:
 	AItem();
 
 	virtual void Tick(float DeltaTime) override;
-	virtual void Equip(USceneComponent* Parent, FName InSocketName);
 	void AttachMeshToSocket(USceneComponent* Parent, FName InSocketName);
 
 protected:

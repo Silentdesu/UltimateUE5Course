@@ -40,10 +40,6 @@ void AItem::Tick(float DeltaTime)
 	}
 }
 
-void AItem::Equip(USceneComponent* Parent, FName InSocketName)
-{
-}
-
 void AItem::AttachMeshToSocket(USceneComponent* Parent, FName InSocketName)
 {
 	const FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,

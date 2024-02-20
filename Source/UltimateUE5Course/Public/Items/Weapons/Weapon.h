@@ -20,7 +20,7 @@ public:
 public:
 
 	TArray<AActor*> IgnoreActors;
-	virtual void Equip(USceneComponent* Parent, FName InSocketName) override;
+	void Equip(USceneComponent* Parent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator);
 
 protected:
 	
@@ -53,4 +53,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	FVector BoxHalfExtentSize;
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 20.0F;
 };

@@ -1,8 +1,9 @@
 #include "Enemies/Enemy.h"
-
+#include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 AEnemy::AEnemy()
 {
@@ -13,6 +14,14 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
+
+	WidgetComponent = CreateDefaultSubobject<UHealthBarComponent>(TEXT("WidgetComp"));
+	WidgetComponent->SetupAttachment(GetRootComponent());
+
+	SphereComponent = CreateDefaultSubobject<USphereComponent>("AgroSphere");
+	SphereComponent->SetupAttachment(GetRootComponent());
 }
 
 void AEnemy::BeginPlay()
@@ -20,6 +29,9 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	AnimInstance = GetMesh()->GetAnimInstance();
+	WidgetComponent->SetHealth(1.0F);
+	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnAgroSphereEndOverlap);
+	SetHealthBarWidgetVisibility(false);
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName) const
@@ -43,7 +55,16 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	GetDirectionalHit(ImpactPoint);
+	SetHealthBarWidgetVisibility(true);
+
+	if (AttributeComponent->IsAlive())
+	{
+		GetDirectionalHit(ImpactPoint);
+	}
+	else
+	{
+		Die();
+	}
 
 	if (HitSound)
 	{
@@ -55,6 +76,7 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
 	}
 }
+
 
 void AEnemy::GetDirectionalHit(const FVector& ImpactPoint) const
 {
@@ -85,4 +107,37 @@ void AEnemy::GetDirectionalHit(const FVector& ImpactPoint) const
 	}
 
 	PlayHitReactMontage(Section);
+}
+
+void AEnemy::Die()
+{
+	if (DeathMontage && DeathAnimations.Num() > 0 && DeathPosses.Num() > 0)
+	{
+		const int32 Section = FMath::RandRange(0, DeathAnimations.Num() - 1);
+		AnimInstance->Montage_Play(DeathMontage);
+		AnimInstance->Montage_JumpToSection(DeathAnimations[Section], DeathMontage);
+		DeathPose = DeathPosses[Section];
+		WidgetComponent->SetVisibility(false);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SetLifeSpan(LifeSpan);
+	}
+}
+
+float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                         AActor* DamageCauser)
+{
+	AttributeComponent->ApplyHealthChange(Damage);
+	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
+	CombatTarget = EventInstigator->GetPawn();
+	return Damage;
+}
+
+void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor == CombatTarget)
+	{
+		CombatTarget = nullptr;
+		WidgetComponent->SetVisibility(false);
+	}
 }

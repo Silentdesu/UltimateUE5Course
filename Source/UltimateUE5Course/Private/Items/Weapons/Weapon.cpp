@@ -24,8 +24,10 @@ AWeapon::AWeapon()
 	BoxHalfExtentSize = FVector(5.0F, 5.0F, 5.0F);
 }
 
-void AWeapon::Equip(USceneComponent* Parent, FName InSocketName)
+void AWeapon::Equip(USceneComponent* Parent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator)
 {
+	SetOwner(NewOwner);
+	SetInstigator(NewInstigator);
 	AttachMeshToSocket(Parent, InSocketName);
 	Holder = Parent->GetAttachParentActor();
 	State = EItemState::EIS_Equipped;
@@ -89,6 +91,9 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 	if (HitResult.GetActor())
 	{
+		UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigator()->GetController(),
+		                              this, UDamageType::StaticClass());
+		
 		if (IHitable* Hitable = Cast<IHitable>(HitResult.GetActor()))
 		{
 			Hitable->Execute_GetHit(HitResult.GetActor(), HitResult.ImpactPoint);
