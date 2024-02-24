@@ -7,6 +7,7 @@
 #include "Interfaces/Hitable.h"
 #include "Enemy.generated.h"
 
+class UPawnSensingComponent;
 class AAIController;
 class USphereComponent;
 class UHealthBarComponent;
@@ -30,12 +31,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void PlayHitReactMontage(const FName& SectionName) const;
+	void OnPatrolState();
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
 	void Die();
 	AActor* GetPatrolTarget();
 	bool InTargetRange(const AActor* Target, const float& AcceptanceRadius) const;
-	void MoveTo(const AActor* Target, const float& AcceptanceRadius) const;
+	void MoveTo(const AActor* Target, const float& AcceptanceRadius = 15.0F) const;
 	void OnPatrolTimerFinished() const;
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* SeenPawn);
 
 	UFUNCTION()
 	void OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -56,6 +61,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensingComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Sounds")
 	USoundBase* HitSound;
@@ -98,6 +106,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	int32 WaitPatrolMax = 10;
-	
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float AgroMaxSpeed = 300.0F;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float DefaultMaxSpeed = 150.0F;
+
+	EEnemyState ActionState = EEnemyState::EES_Patrolling;
 	FTimerHandle PatrolTimerHandle;
 };

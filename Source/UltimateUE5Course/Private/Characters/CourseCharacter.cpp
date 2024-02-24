@@ -31,6 +31,7 @@ void ACourseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	AnimInstance = GetMesh()->GetAnimInstance();
+	Tags.Add(PLAYER_TAG);
 }
 
 void ACourseCharacter::Tick(float DeltaTime)

@@ -13,3 +13,4 @@ const FName ENEMY_HIT_REACT_FROM_BACK = "FromBack";
 const FName ENEMY_HIT_REACT_FROM_FRONT = "FromFront";
 const FName ENEMY_HIT_REACT_FROM_LEFT = "FromLeft";
 const FName ENEMY_HIT_REACT_FROM_RIGHT = "FromRight";
+const FName PLAYER_TAG = "CourseCharacter";

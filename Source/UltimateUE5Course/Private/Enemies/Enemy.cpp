@@ -8,12 +8,15 @@
 #include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Perception/PawnSensingComponent.h"
 #include "UltimateUE5Course/Constants.h"
 
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	InitialLifeSpan = 0.0F;
+	
 	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -30,6 +33,10 @@ AEnemy::AEnemy()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = bUseControllerRotationRoll = bUseControllerRotationYaw = false;
+
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("Pawn Sensing Component");
+	PawnSensingComponent->SightRadius = 4000.0F;
+	PawnSensingComponent->SetPeripheralVisionAngle(45.0F);
 }
 
 
@@ -43,7 +50,9 @@ void AEnemy::BeginPlay()
 	SetHealthBarWidgetVisibility(false);
 
 	AIController = Cast<AAIController>(GetController());
-	MoveTo(PatrolTarget, 15.0F);
+	MoveTo(PatrolTarget);
+
+	PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemy::OnPawnSeen);
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName) const
@@ -59,17 +68,25 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (InTargetRange(PatrolTarget, PatrolRadius))
+	if (ActionState == EEnemyState::EES_Patrolling)
 	{
-		PatrolTarget = GetPatrolTarget();
-		GetWorldTimerManager().SetTimer(PatrolTimerHandle, this, &AEnemy::OnPatrolTimerFinished,
-		                                FMath::RandRange(WaitPatrolMin, WaitPatrolMax));
+		OnPatrolState();
 	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AEnemy::OnPatrolState()
+{
+	if (InTargetRange(PatrolTarget, PatrolRadius))
+	{
+		PatrolTarget = GetPatrolTarget();
+		GetWorldTimerManager().SetTimer(PatrolTimerHandle, this, &AEnemy::OnPatrolTimerFinished,
+		                                FMath::RandRange(WaitPatrolMin, WaitPatrolMax));
+	}
 }
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
@@ -181,7 +198,18 @@ void AEnemy::MoveTo(const AActor* NewTarget, const float& AcceptanceRadius) cons
 
 void AEnemy::OnPatrolTimerFinished() const
 {
-	MoveTo(PatrolTarget, 15.0F);
+	MoveTo(PatrolTarget);
+}
+
+void AEnemy::OnPawnSeen(APawn* SeenPawn)
+{
+	if (!(ActionState != EEnemyState::EES_Chasing && SeenPawn->ActorHasTag(PLAYER_TAG))) return;
+
+	ActionState = EEnemyState::EES_Chasing;
+	GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
+	GetCharacterMovement()->MaxWalkSpeed = AgroMaxSpeed;
+	CombatTarget = SeenPawn;
+	MoveTo(CombatTarget);
 }
 
 float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -200,5 +228,8 @@ void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		CombatTarget = nullptr;
 		WidgetComponent->SetVisibility(false);
+		ActionState = EEnemyState::EES_Patrolling;
+		GetCharacterMovement()->MaxWalkSpeed = DefaultMaxSpeed;
+		MoveTo(PatrolTarget);
 	}
 }
