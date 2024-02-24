@@ -7,6 +7,7 @@
 #include "Interfaces/Hitable.h"
 #include "Enemy.generated.h"
 
+class AAIController;
 class USphereComponent;
 class UHealthBarComponent;
 class UAttributeComponent;
@@ -31,6 +32,10 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName) const;
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
 	void Die();
+	AActor* GetPatrolTarget();
+	bool InTargetRange(const AActor* Target, const float& AcceptanceRadius) const;
+	void MoveTo(const AActor* Target, const float& AcceptanceRadius) const;
+	void OnPatrolTimerFinished() const;
 
 	UFUNCTION()
 	void OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -65,10 +70,7 @@ private:
 	UHealthBarComponent* WidgetComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
-	TArray<FName> DeathAnimations;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Death")
-	TArray<EDeathPose> DeathPosses;
+	TMap<EDeathPose, FName> DeathAnimationsMap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EDeathPose DeathPose;
@@ -78,4 +80,24 @@ private:
 
 	UPROPERTY()
 	AActor* CombatTarget;
+
+	UPROPERTY()
+	AAIController* AIController;
+	
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	AActor* PatrolTarget;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	TArray<AActor*> PatrolTargets;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float PatrolRadius = 200.0F;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	int32 WaitPatrolMin = 5;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	int32 WaitPatrolMax = 10;
+	
+	FTimerHandle PatrolTimerHandle;
 };

@@ -1,9 +1,14 @@
 #include "Enemies/Enemy.h"
+
+#include "AIController.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "UltimateUE5Course/Constants.h"
 
 AEnemy::AEnemy()
 {
@@ -22,7 +27,11 @@ AEnemy::AEnemy()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("AgroSphere");
 	SphereComponent->SetupAttachment(GetRootComponent());
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationPitch = bUseControllerRotationRoll = bUseControllerRotationYaw = false;
 }
+
 
 void AEnemy::BeginPlay()
 {
@@ -32,6 +41,9 @@ void AEnemy::BeginPlay()
 	WidgetComponent->SetHealth(1.0F);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnAgroSphereEndOverlap);
 	SetHealthBarWidgetVisibility(false);
+
+	AIController = Cast<AAIController>(GetController());
+	MoveTo(PatrolTarget, 15.0F);
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName) const
@@ -46,6 +58,13 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName) const
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (InTargetRange(PatrolTarget, PatrolRadius))
+	{
+		PatrolTarget = GetPatrolTarget();
+		GetWorldTimerManager().SetTimer(PatrolTimerHandle, this, &AEnemy::OnPatrolTimerFinished,
+		                                FMath::RandRange(WaitPatrolMin, WaitPatrolMax));
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -77,7 +96,6 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 	}
 }
 
-
 void AEnemy::GetDirectionalHit(const FVector& ImpactPoint) const
 {
 	const FVector Forward = GetActorForwardVector();
@@ -91,19 +109,19 @@ void AEnemy::GetDirectionalHit(const FVector& ImpactPoint) const
 		Theta *= -1.0F;
 	}
 
-	FName Section("FromBack");
+	FName Section(ENEMY_HIT_REACT_FROM_BACK);
 
 	if (Theta >= -45.0F && Theta < 45.0F)
 	{
-		Section = FName("FromFront");
+		Section = ENEMY_HIT_REACT_FROM_FRONT;
 	}
 	else if (Theta >= -135.0F && Theta < -45.0F)
 	{
-		Section = FName("FromLeft");
+		Section = ENEMY_HIT_REACT_FROM_LEFT;
 	}
 	else if (Theta >= 45.0F && Theta < 135.0F)
 	{
-		Section = FName("FromRight");
+		Section = ENEMY_HIT_REACT_FROM_RIGHT;
 	}
 
 	PlayHitReactMontage(Section);
@@ -111,16 +129,59 @@ void AEnemy::GetDirectionalHit(const FVector& ImpactPoint) const
 
 void AEnemy::Die()
 {
-	if (DeathMontage && DeathAnimations.Num() > 0 && DeathPosses.Num() > 0)
+	if (DeathMontage && DeathAnimationsMap.Num() > 0)
 	{
-		const int32 Section = FMath::RandRange(0, DeathAnimations.Num() - 1);
+		const uint8 Section = FMath::RandRange(static_cast<uint8>(EDeathPose::EDP_Death1),
+		                                       static_cast<uint8>(EDeathPose::EDP_Death5));
+		const EDeathPose DeathType = static_cast<EDeathPose>(Section);
 		AnimInstance->Montage_Play(DeathMontage);
-		AnimInstance->Montage_JumpToSection(DeathAnimations[Section], DeathMontage);
-		DeathPose = DeathPosses[Section];
+		AnimInstance->Montage_JumpToSection(DeathAnimationsMap[DeathType], DeathMontage);
+		DeathPose = DeathType;
 		WidgetComponent->SetVisibility(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		SetLifeSpan(LifeSpan);
 	}
+}
+
+AActor* AEnemy::GetPatrolTarget()
+{
+	TArray<AActor*> ValidTargets;
+	for (AActor* Target : PatrolTargets)
+	{
+		if (Target == PatrolTarget) continue;
+		ValidTargets.AddUnique(Target);
+	}
+
+	const int32 TargetNumber = ValidTargets.Num();
+
+	if (TargetNumber > 0)
+	{
+		return PatrolTargets[FMath::RandRange(0, TargetNumber - 1)];
+	}
+
+	return nullptr;
+}
+
+bool AEnemy::InTargetRange(const AActor* Target, const float& AcceptanceRadius) const
+{
+	if (Target == nullptr) return false;
+	return (Target->GetActorLocation() - GetActorLocation()).Size() <= AcceptanceRadius;
+}
+
+void AEnemy::MoveTo(const AActor* NewTarget, const float& AcceptanceRadius) const
+{
+	if (!(AIController && NewTarget)) return;
+
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalActor(NewTarget);
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
+	FNavPathSharedPtr OutPath;
+	AIController->MoveTo(MoveRequest, &OutPath);
+}
+
+void AEnemy::OnPatrolTimerFinished() const
+{
+	MoveTo(PatrolTarget, 15.0F);
 }
 
 float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
