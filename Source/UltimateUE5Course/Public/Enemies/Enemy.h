@@ -38,6 +38,7 @@ protected:
 	bool InTargetRange(const AActor* Target, const float& AcceptanceRadius) const;
 	void MoveTo(const AActor* Target, const float& AcceptanceRadius = 15.0F) const;
 	void OnPatrolTimerFinished() const;
+	void SetMaxWalkSpeed(const float& NewSpeed) const;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* SeenPawn);
@@ -48,6 +49,7 @@ protected:
 
 	FORCEINLINE
 	void SetHealthBarWidgetVisibility(const bool& IsVisible) const { WidgetComponent->SetVisibility(IsVisible); }
+
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
@@ -100,6 +102,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float PatrolRadius = 200.0F;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float AttackRadius = 150.0F;
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	int32 WaitPatrolMin = 5;
