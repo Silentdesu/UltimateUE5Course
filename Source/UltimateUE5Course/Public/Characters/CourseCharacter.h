@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseCharacter.h"
 #include "CharacterTypes.h"
-#include "GameFramework/Character.h"
 #include "CourseCharacter.generated.h"
 
 class USpringArmComponent;
@@ -12,7 +12,7 @@ class AWeapon;
 class UAnimMontage;
 
 UCLASS()
-class ULTIMATEUE5COURSE_API ACourseCharacter : public ACharacter
+class ULTIMATEUE5COURSE_API ACourseCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -43,21 +43,16 @@ protected:
 	void PerformPitchInput(const float Value);
 	void PerformJump();
 	void PerformEquip();
-	void PerformAttack();
-	void PlayAttackMontage() const;
+	virtual bool CanAttack() const override;
+	virtual void PerformAttack() override;
+	virtual void OnAttackEnd() override;
 
 	FORCEINLINE FVector GetDirection(EAxis::Type type) const
 	{
 		return FRotationMatrix(FRotator(0.0F, GetControlRotation().Yaw, 0.0F)).GetUnitAxis(type);
 	}
 
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void OnAttackEnd() { ActionState = EActionState::EAC_Unoccuppied; }
-
 	void PlayEquipMontage(const FName& SectionName) const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollision(const ECollisionEnabled::Type Type);
 	
 private:
 	
@@ -67,12 +62,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent;
 
-	UPROPERTY()
-	UAnimInstance* AnimInstance;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Montages")
-	UAnimMontage* AttackMontage;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* EquipMontage;
 
@@ -81,9 +70,6 @@ private:
 	
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
-
-	UPROPERTY(VisibleAnywhere, Category = "Weapons")
-	AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;

@@ -1,6 +1,5 @@
 #include "Characters/CourseCharacter.h"
 #include "Camera/CameraComponent.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Items/Item.h"
@@ -30,7 +29,6 @@ void ACourseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AnimInstance = GetMesh()->GetAnimInstance();
 	Tags.Add(PLAYER_TAG);
 }
 
@@ -141,19 +139,23 @@ void ACourseCharacter::PerformEquip()
 	}
 }
 
+bool ACourseCharacter::CanAttack() const
+{
+	return ActionState == EActionState::EAC_Unoccuppied && CharacterState !=
+		ECharacterState::ECS_Unequipped;
+}
+
 void ACourseCharacter::PerformAttack()
 {
-	const bool bCanAttack = ActionState == EActionState::EAC_Unoccuppied && CharacterState !=
-		ECharacterState::ECS_Unequipped;
-	if (!bCanAttack) return;
+	if (!CanAttack()) return;
 
 	PlayAttackMontage();
 	ActionState = EActionState::EAC_Attack;
 }
 
-void ACourseCharacter::PlayAttackMontage() const
+void ACourseCharacter::OnAttackEnd()
 {
-	if (AnimInstance && AttackMontage) AnimInstance->Montage_Play(AttackMontage);
+	ActionState = EActionState::EAC_Unoccuppied;
 }
 
 void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const
@@ -162,14 +164,5 @@ void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const
 	{
 		AnimInstance->Montage_Play(EquipMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
-	}
-}
-
-void ACourseCharacter::SetWeaponCollision(const ECollisionEnabled::Type Type)
-{
-	if (EquippedWeapon && EquippedWeapon->GetBoxComponent())
-	{
-		EquippedWeapon->GetBoxComponent()->SetCollisionEnabled(Type);
-		EquippedWeapon->IgnoreActors.Empty();
 	}
 }

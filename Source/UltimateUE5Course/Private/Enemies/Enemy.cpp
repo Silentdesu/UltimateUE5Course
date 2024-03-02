@@ -1,5 +1,4 @@
 #include "Enemies/Enemy.h"
-
 #include "AIController.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -23,8 +22,6 @@ AEnemy::AEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
-	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
-
 	WidgetComponent = CreateDefaultSubobject<UHealthBarComponent>(TEXT("WidgetComp"));
 	WidgetComponent->SetupAttachment(GetRootComponent());
 
@@ -44,7 +41,6 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AnimInstance = GetMesh()->GetAnimInstance();
 	WidgetComponent->SetHealth(1.0F);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnAgroSphereEndOverlap);
 	SetHealthBarWidgetVisibility(false);
@@ -70,11 +66,6 @@ void AEnemy::Tick(float DeltaTime)
 	}
 }
 
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
 void AEnemy::OnPatrolState()
 {
 	if (InTargetRange(PatrolTarget, PatrolRadius))
@@ -82,15 +73,6 @@ void AEnemy::OnPatrolState()
 		PatrolTarget = GetPatrolTarget();
 		GetWorldTimerManager().SetTimer(PatrolTimerHandle, this, &AEnemy::OnPatrolTimerFinished,
 		                                FMath::RandRange(WaitPatrolMin, WaitPatrolMax));
-	}
-}
-
-void AEnemy::PlayHitReactMontage(const FName& SectionName) const
-{
-	if (HitReactMontage)
-	{
-		AnimInstance->Montage_Play(HitReactMontage);
-		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
 	}
 }
 
@@ -116,37 +98,6 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
 	}
-}
-
-void AEnemy::GetDirectionalHit(const FVector& ImpactPoint) const
-{
-	const FVector Forward = GetActorForwardVector();
-	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
-	const FVector ToHit = (ImpactLowered - GetActorLocation()).GetSafeNormal();
-	double Theta = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(Forward, ToHit)));
-	const FVector Cross = FVector::CrossProduct(Forward, ToHit);
-
-	if (Cross.Z < 0.0F)
-	{
-		Theta *= -1.0F;
-	}
-
-	FName Section(ENEMY_HIT_REACT_FROM_BACK);
-
-	if (Theta >= -45.0F && Theta < 45.0F)
-	{
-		Section = ENEMY_HIT_REACT_FROM_FRONT;
-	}
-	else if (Theta >= -135.0F && Theta < -45.0F)
-	{
-		Section = ENEMY_HIT_REACT_FROM_LEFT;
-	}
-	else if (Theta >= 45.0F && Theta < 135.0F)
-	{
-		Section = ENEMY_HIT_REACT_FROM_RIGHT;
-	}
-
-	PlayHitReactMontage(Section);
 }
 
 void AEnemy::Die()
