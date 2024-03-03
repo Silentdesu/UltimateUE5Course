@@ -8,6 +8,7 @@ const FName JUMP_ACTION = "Jump";
 const FName EQUIP_ACTION = "Equip";
 const FName ATTACK_ACTION = "Attack";
 const FName RIGHT_HAND_SOCKET = "RightHandSocket";
+const FName LEFT_HAND_SOCKET = "LeftHandSocket";
 const FName SPINE_SOCKET = "SpineSocket";
 const FName HIT_REACT_FROM_BACK = "FromBack";
 const FName HIT_REACT_FROM_FRONT = "FromFront";

@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Items/Weapons/Weapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
@@ -49,6 +50,15 @@ void AEnemy::BeginPlay()
 	MoveTo(PatrolTarget);
 
 	PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemy::OnPawnSeen);
+
+	UWorld* World = GetWorld();
+
+	if (World && Weapon)
+	{
+		AWeapon* SpawnedWeapon = World->SpawnActor<AWeapon>(Weapon);
+		SpawnedWeapon->Equip(GetMesh(), RIGHT_HAND_SOCKET, this, this);
+		EquippedWeapon = SpawnedWeapon;
+	}
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -63,6 +73,29 @@ void AEnemy::Tick(float DeltaTime)
 	if (InTargetRange(CombatTarget, AttackRadius) && ActionState != EEnemyState::EES_Attacking)
 	{
 		ActionState = EEnemyState::EES_Attacking;
+	}
+}
+
+float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                         AActor* DamageCauser)
+{
+	AttributeComponent->ApplyHealthChange(Damage);
+	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
+	CombatTarget = EventInstigator->GetPawn();
+	SetMaxWalkSpeed(AgroMaxSpeed);
+	ActionState = EEnemyState::EES_Chasing;
+	MoveTo(CombatTarget);
+	
+	return Damage;
+}
+
+void AEnemy::Destroyed()
+{
+	Super::Destroyed();
+
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
 	}
 }
 
@@ -170,19 +203,6 @@ void AEnemy::OnPawnSeen(APawn* SeenPawn)
 		ActionState = EEnemyState::EES_Chasing;
 		MoveTo(SeenPawn);
 	}
-}
-
-float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
-                         AActor* DamageCauser)
-{
-	AttributeComponent->ApplyHealthChange(Damage);
-	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
-	CombatTarget = EventInstigator->GetPawn();
-	SetMaxWalkSpeed(AgroMaxSpeed);
-	ActionState = EEnemyState::EES_Chasing;
-	MoveTo(CombatTarget);
-	
-	return Damage;
 }
 
 void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

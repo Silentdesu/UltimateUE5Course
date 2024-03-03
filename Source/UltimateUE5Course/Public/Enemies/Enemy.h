@@ -10,8 +10,7 @@ class UPawnSensingComponent;
 class AAIController;
 class USphereComponent;
 class UHealthBarComponent;
-class UAttributeComponent;
-class UAnimMontage;
+class AWeapon;
 
 UCLASS()
 class ULTIMATEUE5COURSE_API AEnemy : public ABaseCharacter
@@ -25,6 +24,7 @@ public:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator,
 	                         AActor* DamageCauser) override;
+	virtual void Destroyed() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -55,9 +55,11 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensingComponent;
 
-
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* WidgetComponent;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWeapon> Weapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
 	TMap<EDeathPose, FName> DeathAnimationsMap;

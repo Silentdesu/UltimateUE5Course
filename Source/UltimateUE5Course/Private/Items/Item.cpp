@@ -9,6 +9,8 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(MeshComponent);
 	MeshComponent->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
