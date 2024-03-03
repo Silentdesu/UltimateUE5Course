@@ -80,7 +80,11 @@ bool ABaseCharacter::CanAttack() const { return true; }
 
 void ABaseCharacter::PlayAttackMontage() const
 {
-	if (AnimInstance && AttackMontage) AnimInstance->Montage_Play(AttackMontage);
+	if (AnimInstance && AttackMontage && Attacks.Num() > 0)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		AnimInstance->Montage_JumpToSection(Attacks[FMath::RandRange(0, Attacks.Num() - 1)]);
+	}
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName) const

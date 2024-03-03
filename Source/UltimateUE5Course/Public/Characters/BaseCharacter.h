@@ -22,6 +22,7 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+	virtual bool CanAttack() const;
 	virtual void PerformAttack(); 
 	virtual void Die();
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
@@ -30,7 +31,6 @@ protected:
 	 * Montages
 	 */
 	
-	virtual bool CanAttack() const;
 	virtual void PlayAttackMontage() const;
 	void PlayHitReactMontage(const FName& SectionName) const;
 
@@ -62,6 +62,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	TArray<FName> Attacks;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* HitReactMontage;
 

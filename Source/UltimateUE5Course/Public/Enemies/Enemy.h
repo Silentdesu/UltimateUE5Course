@@ -27,7 +27,9 @@ public:
 	virtual void Destroyed() override;
 
 protected:
+	
 	virtual void BeginPlay() override;
+
 	void OnPatrolState();
 	virtual void Die() override;
 	AActor* GetPatrolTarget();
@@ -35,6 +37,7 @@ protected:
 	void MoveTo(const AActor* Target, const float& AcceptanceRadius = 15.0F) const;
 	void OnPatrolTimerFinished() const;
 	void SetMaxWalkSpeed(const float& NewSpeed) const;
+	virtual void PerformAttack() override;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* SeenPawn);
@@ -45,7 +48,6 @@ protected:
 
 	FORCEINLINE
 	void SetHealthBarWidgetVisibility(const bool& IsVisible) const { WidgetComponent->SetVisibility(IsVisible); }
-
 
 private:
 
@@ -82,6 +84,9 @@ private:
 	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
 	TArray<AActor*> PatrolTargets;
 
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float CombatTargetRadius = 60.0F;
+	
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float PatrolRadius = 200.0F;
 

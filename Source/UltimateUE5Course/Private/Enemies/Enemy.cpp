@@ -73,6 +73,7 @@ void AEnemy::Tick(float DeltaTime)
 	if (InTargetRange(CombatTarget, AttackRadius) && ActionState != EEnemyState::EES_Attacking)
 	{
 		ActionState = EEnemyState::EES_Attacking;
+		PerformAttack();
 	}
 }
 
@@ -84,7 +85,7 @@ float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AControl
 	CombatTarget = EventInstigator->GetPawn();
 	SetMaxWalkSpeed(AgroMaxSpeed);
 	ActionState = EEnemyState::EES_Chasing;
-	MoveTo(CombatTarget);
+	MoveTo(CombatTarget, CombatTargetRadius);
 	
 	return Damage;
 }
@@ -201,7 +202,7 @@ void AEnemy::OnPawnSeen(APawn* SeenPawn)
 	if (ActionState != EEnemyState::EES_Attacking)
 	{
 		ActionState = EEnemyState::EES_Chasing;
-		MoveTo(SeenPawn);
+		MoveTo(SeenPawn, CombatTargetRadius);
 	}
 }
 
@@ -221,4 +222,10 @@ void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
 void AEnemy::SetMaxWalkSpeed(const float& NewSpeed) const
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+}
+
+void AEnemy::PerformAttack()
+{
+	Super::PerformAttack();
+	PlayAttackMontage();
 }
