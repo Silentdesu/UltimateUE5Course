@@ -6,7 +6,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
 #include "Items/Weapons/Weapon.h"
-#include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "UltimateUE5Course/Constants.h"
@@ -65,28 +64,21 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (ActionState == EEnemyState::EES_Patrolling)
+	if (IsPatrolling()) OnPatrolState();
+	else if (IsInsideAttackRadius() && !IsAttacking())
 	{
-		OnPatrolState();
-	}
-
-	if (InTargetRange(CombatTarget, AttackRadius) && ActionState != EEnemyState::EES_Attacking)
-	{
-		ActionState = EEnemyState::EES_Attacking;
-		PerformAttack();
+		if (!IsEngaged()) SetAttackState();
 	}
 }
 
 float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
                          AActor* DamageCauser)
 {
-	AttributeComponent->ApplyHealthChange(Damage);
-	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
+	ApplyDamage(Damage);
 	CombatTarget = EventInstigator->GetPawn();
-	SetMaxWalkSpeed(AgroMaxSpeed);
-	ActionState = EEnemyState::EES_Chasing;
-	MoveTo(CombatTarget, CombatTargetRadius);
-	
+	ClearTimer(AttackTimer);
+	SetChasingState();
+
 	return Damage;
 }
 
@@ -105,7 +97,7 @@ void AEnemy::OnPatrolState()
 	if (InTargetRange(PatrolTarget, PatrolRadius))
 	{
 		PatrolTarget = GetPatrolTarget();
-		GetWorldTimerManager().SetTimer(PatrolTimerHandle, this, &AEnemy::OnPatrolTimerFinished,
+		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemy::OnPatrolTimerFinished,
 		                                FMath::RandRange(WaitPatrolMin, WaitPatrolMax));
 	}
 }
@@ -113,25 +105,10 @@ void AEnemy::OnPatrolState()
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	SetHealthBarWidgetVisibility(true);
-
-	if (AttributeComponent->IsAlive())
-	{
-		GetDirectionalHit(ImpactPoint);
-	}
-	else
-	{
-		Die();
-	}
-
-	if (HitSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
-	}
-
-	if (HitParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
-	}
+	if (AttributeComponent->IsAlive())GetDirectionalHit(ImpactPoint);
+	else Die();
+	PlayHitSound(ImpactPoint);
+	PlayHitParticles(ImpactPoint);
 }
 
 void AEnemy::Die()
@@ -144,7 +121,7 @@ void AEnemy::Die()
 		AnimInstance->Montage_Play(DeathMontage);
 		AnimInstance->Montage_JumpToSection(DeathAnimationsMap[DeathType], DeathMontage);
 		DeathPose = DeathType;
-		WidgetComponent->SetVisibility(false);
+		SetHealthBarWidgetVisibility(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		SetLifeSpan(LifeSpan);
 	}
@@ -193,16 +170,15 @@ void AEnemy::OnPatrolTimerFinished() const
 
 void AEnemy::OnPawnSeen(APawn* SeenPawn)
 {
-	if (!(ActionState != EEnemyState::EES_Chasing && SeenPawn->ActorHasTag(PLAYER_TAG))) return;
+	const bool bShouldChaseTarget =
+		!IsDead() && !IsChasing() && ActionState < EEnemyState::EES_Attacking && SeenPawn->ActorHasTag(PLAYER_TAG);
 
-	GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
-	SetMaxWalkSpeed(AgroMaxSpeed);
-	CombatTarget = SeenPawn;
-
-	if (ActionState != EEnemyState::EES_Attacking)
+	if (bShouldChaseTarget)
 	{
-		ActionState = EEnemyState::EES_Chasing;
-		MoveTo(SeenPawn, CombatTargetRadius);
+		CombatTarget = SeenPawn;
+		ClearTimer(PatrolTimer);
+		ClearTimer(AttackTimer);
+		if (!IsEngaged()) SetChasingState();
 	}
 }
 
@@ -211,11 +187,9 @@ void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
 {
 	if (OtherActor == CombatTarget)
 	{
-		CombatTarget = nullptr;
-		WidgetComponent->SetVisibility(false);
-		ActionState = EEnemyState::EES_Patrolling;
-		SetMaxWalkSpeed(DefaultMaxSpeed);
-		MoveTo(PatrolTarget);
+		ClearTimer(AttackTimer);
+		LoseInterest();
+		if (!IsEngaged()) SetPatrollingState();
 	}
 }
 
@@ -228,4 +202,10 @@ void AEnemy::PerformAttack()
 {
 	Super::PerformAttack();
 	PlayAttackMontage();
+}
+
+void AEnemy::ApplyDamage(const float& Damage)
+{
+	Super::ApplyDamage(Damage);
+	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
 }

@@ -27,17 +27,17 @@ public:
 	virtual void Destroyed() override;
 
 protected:
-	
 	virtual void BeginPlay() override;
+	virtual void Die() override;
+	virtual void PerformAttack() override;
+	virtual void ApplyDamage(const float& Damage) override;
 
 	void OnPatrolState();
-	virtual void Die() override;
 	AActor* GetPatrolTarget();
 	bool InTargetRange(const AActor* Target, const float& AcceptanceRadius) const;
 	void MoveTo(const AActor* Target, const float& AcceptanceRadius = 15.0F) const;
 	void OnPatrolTimerFinished() const;
 	void SetMaxWalkSpeed(const float& NewSpeed) const;
-	virtual void PerformAttack() override;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* SeenPawn);
@@ -51,6 +51,43 @@ protected:
 
 private:
 
+	void SetPatrollingState()
+	{
+		ActionState = EEnemyState::EES_Patrolling;
+		SetMaxWalkSpeed(DefaultMaxSpeed);
+		MoveTo(PatrolTarget);
+	}
+	
+	void SetChasingState()
+	{
+		ActionState = EEnemyState::EES_Chasing;
+		SetMaxWalkSpeed(AgroMaxSpeed);
+		MoveTo(CombatTarget, CombatTargetRadius);
+	}
+
+	void SetAttackState()
+	{
+		ActionState = EEnemyState::EES_Attacking;
+		const float AttackTime = FMath::RandRange(AttackMin, AttackMax);
+		GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::PerformAttack, AttackTime);
+	}
+
+	void LoseInterest()
+	{
+		CombatTarget = nullptr;
+		SetHealthBarWidgetVisibility(false);
+	}
+
+	bool IsPatrolling() const { return ActionState == EEnemyState::EES_Patrolling; }
+	bool IsChasing() const { return ActionState == EEnemyState::EES_Chasing; }
+	bool IsAttacking() const { return ActionState == EEnemyState::EES_Attacking; }
+	bool IsEngaged() const { return ActionState == EEnemyState::EES_Engaged; }
+	bool IsInsideAttackRadius() const { return InTargetRange(CombatTarget, AttackRadius); }
+	bool IsDead() const { return ActionState == EEnemyState::EES_Dead; }
+
+	FORCEINLINE void ClearTimer(FTimerHandle& TimerHandle) const { GetWorldTimerManager().ClearTimer(TimerHandle); }
+
+private:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereComponent;
 
@@ -66,9 +103,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
 	TMap<EDeathPose, FName> DeathAnimationsMap;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	EDeathPose DeathPose;
-
 	UPROPERTY(EditAnywhere, Category = "Death")
 	float LifeSpan = 3.0F;
 
@@ -77,7 +111,7 @@ private:
 
 	UPROPERTY()
 	AAIController* AIController;
-	
+
 	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
 	AActor* PatrolTarget;
 
@@ -86,7 +120,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float CombatTargetRadius = 60.0F;
-	
+
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float PatrolRadius = 200.0F;
 
@@ -105,6 +139,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float DefaultMaxSpeed = 150.0F;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMin = 0.5F;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMax = 1.0F;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EEnemyState ActionState = EEnemyState::EES_Patrolling;
-	FTimerHandle PatrolTimerHandle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	EDeathPose DeathPose;
+	
+	FTimerHandle PatrolTimer;
+	FTimerHandle AttackTimer;
 };

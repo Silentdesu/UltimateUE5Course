@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/Hitable.h"
+#include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.generated.h"
 
 class AWeapon;
@@ -25,6 +26,7 @@ protected:
 	virtual bool CanAttack() const;
 	virtual void PerformAttack(); 
 	virtual void Die();
+	virtual void ApplyDamage(const float& Damage);
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
 
 	/*
@@ -34,11 +36,27 @@ protected:
 	virtual void PlayAttackMontage() const;
 	void PlayHitReactMontage(const FName& SectionName) const;
 
+	/*
+	 * BlueprintCallables
+	 */
+	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponCollision(const ECollisionEnabled::Type Type);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnAttackEnd();
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void PlayHitSound(const FVector& ImpactPoint)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+	}
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void PlayHitParticles(const FVector& ImpactPoint)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
+	}
 
 protected:
 

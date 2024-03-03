@@ -45,6 +45,11 @@ void ABaseCharacter::Die()
 {
 }
 
+void ABaseCharacter::ApplyDamage(const float& Damage)
+{
+	AttributeComponent->ApplyHealthChange(Damage);
+}
+
 void ABaseCharacter::GetDirectionalHit(const FVector& ImpactPoint) const
 {
 	const FVector Forward = GetActorForwardVector();
