@@ -28,10 +28,24 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	void CheckAction()
+	{
+		if (IsPatrolling())
+		{
+			OnPatrolState();
+		}
+		else if (CanAttack())
+		{
+			if (!IsEngaged()) SetAttackState();
+		}
+	}
+
 	virtual void Die() override;
 	virtual void PerformAttack() override;
 	virtual void ApplyDamage(const float& Damage) override;
 	virtual int32 PlayDeathMontage() override;
+	virtual void OnAttackEnd() override;
 
 	void OnPatrolState();
 	AActor* GetPatrolTarget();
@@ -51,14 +65,13 @@ protected:
 	void SetHealthBarWidgetVisibility(const bool& IsVisible) const { WidgetComponent->SetVisibility(IsVisible); }
 
 private:
-
 	void SetPatrollingState()
 	{
 		ActionState = EEnemyState::EES_Patrolling;
 		SetMaxWalkSpeed(DefaultMaxSpeed);
 		MoveTo(PatrolTarget);
 	}
-	
+
 	void SetChasingState()
 	{
 		ActionState = EEnemyState::EES_Chasing;
@@ -83,6 +96,12 @@ private:
 	bool IsChasing() const { return ActionState == EEnemyState::EES_Chasing; }
 	bool IsAttacking() const { return ActionState == EEnemyState::EES_Attacking; }
 	bool IsEngaged() const { return ActionState == EEnemyState::EES_Engaged; }
+
+	virtual bool CanAttack() const override
+	{
+		return IsInsideAttackRadius() && !IsAttacking() && !IsEngaged() && !IsDead();
+	}
+
 	bool IsInsideAttackRadius() const { return InTargetRange(CombatTarget, AttackRadius); }
 	bool IsDead() const { return ActionState == EEnemyState::EES_Dead; }
 
@@ -145,7 +164,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<EDeathPose> DeathPose;
-	
+
 	FTimerHandle PatrolTimer;
 	FTimerHandle AttackTimer;
 };

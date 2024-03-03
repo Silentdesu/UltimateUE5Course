@@ -66,11 +66,7 @@ void AEnemy::Tick(float DeltaTime)
 
 	if (IsDead()) return;
 	
-	if (IsPatrolling()) OnPatrolState();
-	else if (IsInsideAttackRadius() && !IsAttacking())
-	{
-		if (!IsEngaged()) SetAttackState();
-	}
+	CheckAction();
 }
 
 float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -199,6 +195,7 @@ void AEnemy::SetMaxWalkSpeed(const float& NewSpeed) const
 
 void AEnemy::PerformAttack()
 {
+	ActionState = EEnemyState::EES_Engaged;
 	Super::PerformAttack();
 	PlayAttackMontage();
 }
@@ -225,4 +222,16 @@ int32 AEnemy::PlayDeathMontage()
 	}
 
 	return Idx;
+}
+
+void AEnemy::OnAttackEnd()
+{
+	ActionState = EEnemyState::EES_None;
+	if (CombatTarget == nullptr)
+	{
+		SetPatrollingState();
+		return;
+	}
+	
+	CheckAction();
 }
