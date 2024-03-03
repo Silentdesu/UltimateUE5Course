@@ -1,7 +1,7 @@
 #include "Characters/BaseCharacter.h"
-
 #include "Components/AttributeComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Items/Weapons/Weapon.h"
 #include "UltimateUE5Course/Constants.h"
 
@@ -81,22 +81,41 @@ void ABaseCharacter::GetDirectionalHit(const FVector& ImpactPoint) const
 	PlayHitReactMontage(Section);
 }
 
+void ABaseCharacter::SetCapsuleCollision(ECollisionEnabled::Type Type) const
+{
+	GetCapsuleComponent()->SetCollisionEnabled(Type);
+}
+
+int32 ABaseCharacter::PlayRandomMontageBySections(UAnimMontage* Montage, const TArray<FName>& Sections) const
+{
+	if (Sections.Num() <= 0) return -1;
+
+	const int32 Idx = FMath::RandRange(0, Sections.Num() - 1);
+	PlayMontageSection(Montage, Sections[Idx]);
+	return Idx;
+}
+
+void ABaseCharacter::PlayMontageSection(UAnimMontage* Montage, const FName Section) const
+{
+	if (!Montage) return;
+	
+	AnimInstance->Montage_Play(Montage);
+	AnimInstance->Montage_JumpToSection(Section);
+}
+
 bool ABaseCharacter::CanAttack() const { return true; }
 
-void ABaseCharacter::PlayAttackMontage() const
+int32 ABaseCharacter::PlayAttackMontage() const
 {
-	if (AnimInstance && AttackMontage && Attacks.Num() > 0)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-		AnimInstance->Montage_JumpToSection(Attacks[FMath::RandRange(0, Attacks.Num() - 1)]);
-	}
+	return PlayRandomMontageBySections(AttackMontage, AttackMontageSections);
+}
+
+int32 ABaseCharacter::PlayDeathMontage()
+{
+	return PlayRandomMontageBySections(DeathMontage, DeathMontageSections);
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName) const
 {
-	if (HitReactMontage)
-	{
-		AnimInstance->Montage_Play(HitReactMontage);
-		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
-	}
+	PlayMontageSection(HitReactMontage, SectionName);
 }

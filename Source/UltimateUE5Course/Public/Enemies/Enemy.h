@@ -31,6 +31,7 @@ protected:
 	virtual void Die() override;
 	virtual void PerformAttack() override;
 	virtual void ApplyDamage(const float& Damage) override;
+	virtual int32 PlayDeathMontage() override;
 
 	void OnPatrolState();
 	AActor* GetPatrolTarget();
@@ -100,12 +101,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> Weapon;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Death")
-	TMap<EDeathPose, FName> DeathAnimationsMap;
-
-	UPROPERTY(EditAnywhere, Category = "Death")
-	float LifeSpan = 3.0F;
-
 	UPROPERTY()
 	AActor* CombatTarget;
 
@@ -149,7 +144,7 @@ private:
 	EEnemyState ActionState = EEnemyState::EES_Patrolling;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	EDeathPose DeathPose;
+	TEnumAsByte<EDeathPose> DeathPose;
 	
 	FTimerHandle PatrolTimer;
 	FTimerHandle AttackTimer;

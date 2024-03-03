@@ -64,6 +64,8 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsDead()) return;
+	
 	if (IsPatrolling()) OnPatrolState();
 	else if (IsInsideAttackRadius() && !IsAttacking())
 	{
@@ -113,18 +115,13 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 
 void AEnemy::Die()
 {
-	if (DeathMontage && DeathAnimationsMap.Num() > 0)
-	{
-		const uint8 Section = FMath::RandRange(static_cast<uint8>(EDeathPose::EDP_Death1),
-		                                       static_cast<uint8>(EDeathPose::EDP_Death5));
-		const EDeathPose DeathType = static_cast<EDeathPose>(Section);
-		AnimInstance->Montage_Play(DeathMontage);
-		AnimInstance->Montage_JumpToSection(DeathAnimationsMap[DeathType], DeathMontage);
-		DeathPose = DeathType;
-		SetHealthBarWidgetVisibility(false);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		SetLifeSpan(LifeSpan);
-	}
+	ActionState = EEnemyState::EES_Dead;
+	ClearTimer(AttackTimer);
+	PlayDeathMontage();
+	SetHealthBarWidgetVisibility(false);
+	SetCapsuleCollision(ECollisionEnabled::NoCollision);
+	SetLifeSpan(DeathLifeSpan);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 AActor* AEnemy::GetPatrolTarget()
@@ -185,6 +182,8 @@ void AEnemy::OnPawnSeen(APawn* SeenPawn)
 void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (IsDead()) return;
+	
 	if (OtherActor == CombatTarget)
 	{
 		ClearTimer(AttackTimer);
@@ -208,4 +207,22 @@ void AEnemy::ApplyDamage(const float& Damage)
 {
 	Super::ApplyDamage(Damage);
 	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
+}
+
+int32 AEnemy::PlayDeathMontage()
+{
+	const int32 Idx = Super::PlayDeathMontage();
+	const TEnumAsByte<EDeathPose> Pose(Idx);
+	if (Pose < EDP_MAX)
+	{
+		DeathPose = Pose;
+	}
+
+	if (GEngine)
+	{
+		const FString Msg = FString::Printf(TEXT("Death pose: %d"), Idx);
+		GEngine->AddOnScreenDebugMessage(1, 30.0F, FColor::Emerald, Msg);
+	}
+
+	return Idx;
 }

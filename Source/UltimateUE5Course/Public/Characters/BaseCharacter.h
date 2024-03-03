@@ -28,12 +28,16 @@ protected:
 	virtual void Die();
 	virtual void ApplyDamage(const float& Damage);
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
+	void SetCapsuleCollision(ECollisionEnabled::Type Type) const;
 
 	/*
 	 * Montages
 	 */
-	
-	virtual void PlayAttackMontage() const;
+
+	void PlayMontageSection(UAnimMontage* Montage, const FName Section) const;
+	int32 PlayRandomMontageBySections(UAnimMontage* Montage, const TArray<FName>& Sections) const;
+	virtual int32 PlayAttackMontage() const;
+	virtual int32 PlayDeathMontage();
 	void PlayHitReactMontage(const FName& SectionName) const;
 
 	/*
@@ -81,13 +85,16 @@ protected:
 	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
-	TArray<FName> Attacks;
+	TArray<FName> AttackMontageSections;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	TArray<FName> DeathMontageSections;
 
 	/*
 	 * SFX & VFX
@@ -98,4 +105,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	UParticleSystem* HitParticle;
+
+	UPROPERTY(EditAnywhere, Category = "Death")
+	float DeathLifeSpan = 10.0F;
 };
