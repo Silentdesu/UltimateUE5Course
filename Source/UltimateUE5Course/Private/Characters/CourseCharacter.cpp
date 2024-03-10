@@ -13,6 +13,12 @@ ACourseCharacter::ACourseCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0F, 400.0F, 0.0F);
 
+	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	GetMesh()->SetGenerateOverlapEvents(true);
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->TargetArmLength = 300.0F;
 	CameraBoom->bUsePawnControlRotation = true;
@@ -49,6 +55,12 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(JUMP_ACTION, IE_Pressed, this, &ACourseCharacter::PerformJump);
 	PlayerInputComponent->BindAction(EQUIP_ACTION, IE_Pressed, this, &ACourseCharacter::PerformEquip);
 	PlayerInputComponent->BindAction(ATTACK_ACTION, IE_Pressed, this, &ACourseCharacter::PerformAttack);
+}
+
+void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+{
+	PlayHitSound(ImpactPoint);
+	PlayHitParticles(ImpactPoint);
 }
 
 void ACourseCharacter::Arm()

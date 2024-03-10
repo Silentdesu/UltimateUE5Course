@@ -58,6 +58,8 @@ void AEnemy::BeginPlay()
 		SpawnedWeapon->Equip(GetMesh(), RIGHT_HAND_SOCKET, this, this);
 		EquippedWeapon = SpawnedWeapon;
 	}
+
+	Tags.Add(ENEMY_TAG);
 }
 
 void AEnemy::Tick(float DeltaTime)

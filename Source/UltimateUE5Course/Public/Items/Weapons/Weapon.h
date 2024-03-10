@@ -25,13 +25,6 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
-	
-	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	                                  UPrimitiveComponent* OtherComp,
-	                                  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
-	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 	UFUNCTION()
 	void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -39,8 +32,12 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void CreateFields(const FVector& FieldLocation);
-	
+
 private:
+
+	void BoxTrace(FHitResult& HitResult);
+	bool IsAlly(const AActor* OtherActor) const;
+	void ExecuteGetHit(const FHitResult& HitResult);
 	
 	UPROPERTY(VisibleDefaultsOnly)
 	UBoxComponent* BoxComponent;
@@ -51,6 +48,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* BoxTraceEnd;
 
+	UPROPERTY(EditAnywhere)
+	bool bShowBoxDebug;
+	
 	UPROPERTY(EditAnywhere)
 	FVector BoxHalfExtentSize;
 
