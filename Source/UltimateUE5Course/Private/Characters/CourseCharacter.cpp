@@ -110,31 +110,21 @@ void ACourseCharacter::PerformEquip()
 {
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
 	{
-		Weapon->Equip(GetMesh(), EquipmentSocketName, this, this);
-		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-		OverlappingItem = nullptr;
-		EquippedWeapon = Weapon;
+		EquipWeapon(Weapon);
 	}
 	else
 	{
-		const bool bCanDisarm = ActionState == EActionState::EAC_Unoccuppied &&
-			CharacterState != ECharacterState::ECS_Unequipped;
-
 		const bool bCanArm = ActionState == EActionState::EAC_Unoccuppied &&
 			CharacterState == ECharacterState::ECS_Unequipped &&
 			EquippedWeapon;
 		
-		if (bCanDisarm)
+		if (bCanArm)
 		{
-			PlayEquipMontage(FName("Disarm"));
-			CharacterState = ECharacterState::ECS_Unequipped;
-			ActionState = EActionState::EAC_EquippingWeapon;
+			SetArmState(ARM_STATE, ECharacterState::ECS_EquippedOneHandedWeapon);
 		}
-		else if (bCanArm)
+		else
 		{
-			PlayEquipMontage(FName("Arm"));
-			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-			ActionState = EActionState::EAC_EquippingWeapon;
+			SetArmState(DISARM_STATE, ECharacterState::ECS_Unequipped);
 		}
 	}
 }
@@ -165,4 +155,12 @@ void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const
 		AnimInstance->Montage_Play(EquipMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
 	}
+}
+
+void ACourseCharacter::EquipWeapon(AWeapon* Weapon)
+{
+	Weapon->Equip(GetMesh(), EquipmentSocketName, this, this);
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
 }

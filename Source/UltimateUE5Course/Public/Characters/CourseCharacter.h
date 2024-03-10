@@ -52,7 +52,15 @@ protected:
 		return FRotationMatrix(FRotator(0.0F, GetControlRotation().Yaw, 0.0F)).GetUnitAxis(type);
 	}
 
+	FORCEINLINE void SetArmState(const FName& StateName, ECharacterState State)
+	{
+		PlayEquipMontage(StateName);
+		CharacterState = State;
+		ActionState = EActionState::EAC_EquippingWeapon;
+	}
+
 	void PlayEquipMontage(const FName& SectionName) const;
+	void EquipWeapon(AWeapon* Weapon);
 	
 private:
 	
