@@ -6,7 +6,6 @@
 #include "Interfaces/Hitable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "UltimateUE5Course/Constants.h"
 
 AWeapon::AWeapon()
 {
@@ -66,8 +65,10 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	FHitResult HitResult;
 	BoxTrace(HitResult);
 
-	if (HitResult.GetActor() && !IsAlly(HitResult.GetActor()))
+	if (HitResult.GetActor())
 	{
+		if (IsAlly(HitResult.GetActor())) return;
+		
 		UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigator()->GetController(),
 		                              this, UDamageType::StaticClass());
 
@@ -96,11 +97,6 @@ void AWeapon::BoxTrace(FHitResult& HitResult)
 	                                     Trace, HitResult, true);
 
 	IgnoreActors.AddUnique(HitResult.GetActor());
-}
-
-bool AWeapon::IsAlly(const AActor* OtherActor) const
-{
-	return GetOwner()->ActorHasTag(ENEMY_TAG) && OtherActor - ActorHasTag(ENEMY_TAG);
 }
 
 void AWeapon::ExecuteGetHit(const FHitResult& HitResult)

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Items/Item.h"
+#include "UltimateUE5Course/Constants.h"
 #include "Weapon.generated.h"
 
 class UBoxComponent;
@@ -36,7 +37,6 @@ protected:
 private:
 
 	void BoxTrace(FHitResult& HitResult);
-	bool IsAlly(const AActor* OtherActor) const;
 	void ExecuteGetHit(const FHitResult& HitResult);
 	
 	UPROPERTY(VisibleDefaultsOnly)
@@ -56,4 +56,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.0F;
+
+	
+	FORCEINLINE bool IsAlly(const AActor* OtherActor) const
+	{ return GetOwner()->ActorHasTag(ENEMY_TAG) && OtherActor->ActorHasTag(ENEMY_TAG); }
 };
