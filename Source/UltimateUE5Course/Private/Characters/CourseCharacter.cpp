@@ -59,8 +59,7 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	PlayHitSound(ImpactPoint);
-	PlayHitParticles(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint);
 }
 
 void ACourseCharacter::Arm()

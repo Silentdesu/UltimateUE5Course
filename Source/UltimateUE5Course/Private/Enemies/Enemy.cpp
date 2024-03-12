@@ -105,10 +105,7 @@ void AEnemy::OnPatrolState()
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	SetHealthBarWidgetVisibility(true);
-	if (AttributeComponent->IsAlive())GetDirectionalHit(ImpactPoint);
-	else Die();
-	PlayHitSound(ImpactPoint);
-	PlayHitParticles(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint);
 }
 
 void AEnemy::Die()
