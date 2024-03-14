@@ -102,10 +102,10 @@ void AEnemy::OnPatrolState()
 	}
 }
 
-void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
 	SetHealthBarWidgetVisibility(true);
-	Super::GetHit_Implementation(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Attacker);
 	ClearTimer(PatrolTimer);
 }
 

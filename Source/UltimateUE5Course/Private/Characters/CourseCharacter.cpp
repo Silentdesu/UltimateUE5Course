@@ -57,10 +57,11 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(ATTACK_ACTION, IE_Pressed, this, &ACourseCharacter::PerformAttack);
 }
 
-void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
-	Super::GetHit_Implementation(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Attacker);
 	ActionState = EActionState::EAC_HitReact;
+	SetWeaponCollision(ECollisionEnabled::NoCollision);
 }
 
 void ACourseCharacter::Arm()

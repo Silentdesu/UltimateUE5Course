@@ -17,7 +17,7 @@ class ULTIMATEUE5COURSE_API ABreakableProp : public AActor, public IHitable
 public:	
 	ABreakableProp();
 	virtual void Tick(float DeltaTime) override;
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
 
 protected:
 	virtual void BeginPlay() override;

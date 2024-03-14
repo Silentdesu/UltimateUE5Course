@@ -30,7 +30,7 @@ void ABreakableProp::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABreakableProp::GetHit_Implementation(const FVector& ImpactPoint)
+void ABreakableProp::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
 	if (bHasBroken) return;
 	

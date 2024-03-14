@@ -27,7 +27,7 @@ protected:
 	virtual void PerformAttack(); 
 	virtual void Die();
 	virtual void ApplyDamage(const float& Damage);
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
 	void SetCapsuleCollision(ECollisionEnabled::Type Type) const;
 

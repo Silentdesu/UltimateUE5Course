@@ -103,6 +103,6 @@ void AWeapon::ExecuteGetHit(const FHitResult& HitResult)
 {
 	if (IHitable* Hitable = Cast<IHitable>(HitResult.GetActor()))
 	{
-		Hitable->Execute_GetHit(HitResult.GetActor(), HitResult.ImpactPoint);
+		Hitable->Execute_GetHit(HitResult.GetActor(), HitResult.ImpactPoint, GetOwner());
 	}
 }

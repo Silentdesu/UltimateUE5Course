@@ -50,9 +50,9 @@ void ABaseCharacter::ApplyDamage(const float& Damage)
 	AttributeComponent->ApplyHealthChange(Damage);
 }
 
-void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
-	if (AttributeComponent->IsAlive())GetDirectionalHit(ImpactPoint);
+	if (AttributeComponent->IsAlive() && Attacker)GetDirectionalHit(Attacker->GetActorLocation());
 	else Die();
 	PlayHitSound(ImpactPoint);
 	PlayHitParticles(ImpactPoint);
