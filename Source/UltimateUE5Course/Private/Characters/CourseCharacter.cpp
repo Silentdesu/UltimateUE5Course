@@ -60,6 +60,7 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	Super::GetHit_Implementation(ImpactPoint);
+	ActionState = EActionState::EAC_HitReact;
 }
 
 void ACourseCharacter::Arm()
@@ -78,7 +79,7 @@ void ACourseCharacter::Disarm()
 	}
 }
 
-void ACourseCharacter::FinishEquippingWeapon()
+void ACourseCharacter::SetUnoccupiedState()
 {
 	ActionState = EActionState::EAC_Unoccuppied;
 }
@@ -128,7 +129,7 @@ void ACourseCharacter::PerformEquip()
 		const bool bCanArm = ActionState == EActionState::EAC_Unoccuppied &&
 			CharacterState == ECharacterState::ECS_Unequipped &&
 			EquippedWeapon;
-		
+
 		if (bCanArm)
 		{
 			SetArmState(ARM_STATE, ECharacterState::ECS_EquippedOneHandedWeapon);
@@ -152,11 +153,6 @@ void ACourseCharacter::PerformAttack()
 
 	PlayAttackMontage();
 	ActionState = EActionState::EAC_Attack;
-}
-
-void ACourseCharacter::OnAttackEnd()
-{
-	ActionState = EActionState::EAC_Unoccuppied;
 }
 
 void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const

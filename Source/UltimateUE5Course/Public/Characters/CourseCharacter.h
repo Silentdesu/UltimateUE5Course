@@ -33,7 +33,7 @@ public:
 	FORCEINLINE void Disarm();
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void FinishEquippingWeapon();
+	FORCEINLINE void SetUnoccupiedState();
 
 protected:
 	virtual void BeginPlay() override;
@@ -46,7 +46,6 @@ protected:
 	void PerformEquip();
 	virtual bool CanAttack() const override;
 	virtual void PerformAttack() override;
-	virtual void OnAttackEnd() override;
 
 	FORCEINLINE FVector GetDirection(EAxis::Type type) const
 	{

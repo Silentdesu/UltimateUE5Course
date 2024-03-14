@@ -106,17 +106,21 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	SetHealthBarWidgetVisibility(true);
 	Super::GetHit_Implementation(ImpactPoint);
+	ClearTimer(PatrolTimer);
 }
 
 void AEnemy::Die()
 {
+	if (ActionState == EEnemyState::EES_Dead) return;
+	
 	ActionState = EEnemyState::EES_Dead;
-	ClearTimer(AttackTimer);
+	SetLifeSpan(DeathLifeSpan);
 	PlayDeathMontage();
 	SetHealthBarWidgetVisibility(false);
-	SetCapsuleCollision(ECollisionEnabled::NoCollision);
-	SetLifeSpan(DeathLifeSpan);
+	ClearTimer(AttackTimer);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+	SetCapsuleCollision(ECollisionEnabled::NoCollision);
+	SetWeaponCollision(ECollisionEnabled::NoCollision);
 }
 
 AActor* AEnemy::GetPatrolTarget()
