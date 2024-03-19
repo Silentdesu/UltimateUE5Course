@@ -77,15 +77,7 @@ float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AControl
 	ApplyDamage(Damage);
 	CombatTarget = EventInstigator->GetPawn();
 	ClearTimer(AttackTimer);
-
-	if (IsInsideAttackRadius())
-	{
-		SetAttackState();
-	}
-	else if (IsOutsideAttackRadius())
-	{
-		SetChasingState();
-	}
+	SetChasingState();
 
 	return Damage;
 }
@@ -167,8 +159,7 @@ void AEnemy::MoveTo(const AActor* NewTarget, const float& AcceptanceRadius) cons
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(NewTarget);
 	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
-	FNavPathSharedPtr OutPath;
-	AIController->MoveTo(MoveRequest, &OutPath);
+	AIController->MoveTo(MoveRequest);
 }
 
 void AEnemy::OnPatrolTimerFinished() const
@@ -227,12 +218,6 @@ int32 AEnemy::PlayDeathMontage()
 	if (Pose < EDP_MAX)
 	{
 		DeathPose = Pose;
-	}
-
-	if (GEngine)
-	{
-		const FString Msg = FString::Printf(TEXT("Death pose: %d"), Idx);
-		GEngine->AddOnScreenDebugMessage(1, 30.0F, FColor::Emerald, Msg);
 	}
 
 	return Idx;
