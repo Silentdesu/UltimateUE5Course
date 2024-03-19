@@ -103,6 +103,7 @@ private:
 	}
 
 	bool IsInsideAttackRadius() const { return InTargetRange(CombatTarget, AttackRadius); }
+	bool IsOutsideAttackRadius() const { return !IsInsideAttackRadius(); }
 	bool IsDead() const { return ActionState == EEnemyState::EES_Dead; }
 
 	FORCEINLINE void ClearTimer(FTimerHandle& TimerHandle) const { GetWorldTimerManager().ClearTimer(TimerHandle); }
@@ -120,7 +121,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> Weapon;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	AActor* CombatTarget;
 
 	UPROPERTY()

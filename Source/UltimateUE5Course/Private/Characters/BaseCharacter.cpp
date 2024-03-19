@@ -128,3 +128,9 @@ void ABaseCharacter::PlayHitReactMontage(const FName& SectionName) const
 {
 	PlayMontageSection(HitReactMontage, SectionName);
 }
+
+void ABaseCharacter::StopMontage(const UAnimMontage* Montage, const float& BlendOut) const
+{
+	const float InBlendOut = BlendOut == 0.25F ? BlendOut : StopMontageBlendOut;
+	AnimInstance->Montage_Stop(InBlendOut, Montage);
+}

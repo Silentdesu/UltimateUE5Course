@@ -40,6 +40,7 @@ protected:
 	virtual int32 PlayAttackMontage() const;
 	virtual int32 PlayDeathMontage();
 	void PlayHitReactMontage(const FName& SectionName) const;
+	void StopMontage(const UAnimMontage* Montage, const float& BlendOut = 0.0F) const;
 
 	/*
 	 * BlueprintCallables
@@ -96,6 +97,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	TArray<FName> DeathMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = "Montages")
+	float StopMontageBlendOut = 0.25F;
 
 	/*
 	 * SFX & VFX

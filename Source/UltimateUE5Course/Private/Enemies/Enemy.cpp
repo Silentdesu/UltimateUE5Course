@@ -67,7 +67,7 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (IsDead()) return;
-	
+
 	CheckAction();
 }
 
@@ -77,7 +77,15 @@ float AEnemy::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AControl
 	ApplyDamage(Damage);
 	CombatTarget = EventInstigator->GetPawn();
 	ClearTimer(AttackTimer);
-	SetChasingState();
+
+	if (IsInsideAttackRadius())
+	{
+		SetAttackState();
+	}
+	else if (IsOutsideAttackRadius())
+	{
+		SetChasingState();
+	}
 
 	return Damage;
 }
@@ -107,13 +115,16 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 	Super::GetHit_Implementation(ImpactPoint, Attacker);
 
 	if (!IsDead()) SetHealthBarWidgetVisibility(true);
+	SetWeaponCollision(ECollisionEnabled::NoCollision);
 	ClearTimer(PatrolTimer);
+	ClearTimer(AttackTimer);
+	StopMontage(AttackMontage);
 }
 
 void AEnemy::Die()
 {
 	if (ActionState == EEnemyState::EES_Dead) return;
-	
+
 	ActionState = EEnemyState::EES_Dead;
 	SetLifeSpan(DeathLifeSpan);
 	PlayDeathMontage();
@@ -183,7 +194,7 @@ void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (IsDead()) return;
-	
+
 	if (OtherActor == CombatTarget)
 	{
 		ClearTimer(AttackTimer);
@@ -235,6 +246,6 @@ void AEnemy::OnAttackEnd()
 		SetPatrollingState();
 		return;
 	}
-	
+
 	CheckAction();
 }
