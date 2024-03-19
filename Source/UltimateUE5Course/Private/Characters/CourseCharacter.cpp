@@ -152,8 +152,8 @@ void ACourseCharacter::PerformAttack()
 {
 	if (!CanAttack()) return;
 
-	PlayAttackMontage();
 	ActionState = EActionState::EAC_Attack;
+	Super::PerformAttack();
 }
 
 void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const

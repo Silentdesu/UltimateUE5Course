@@ -104,8 +104,9 @@ void AEnemy::OnPatrolState()
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
-	SetHealthBarWidgetVisibility(true);
 	Super::GetHit_Implementation(ImpactPoint, Attacker);
+
+	if (!IsDead()) SetHealthBarWidgetVisibility(true);
 	ClearTimer(PatrolTimer);
 }
 
@@ -200,7 +201,6 @@ void AEnemy::PerformAttack()
 {
 	ActionState = EEnemyState::EES_Engaged;
 	Super::PerformAttack();
-	PlayAttackMontage();
 }
 
 void AEnemy::ApplyDamage(const float& Damage)

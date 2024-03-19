@@ -39,6 +39,7 @@ void ABaseCharacter::OnAttackEnd()
 
 void ABaseCharacter::PerformAttack()
 {
+	PlayAttackMontage();
 }
 
 void ABaseCharacter::Die()
