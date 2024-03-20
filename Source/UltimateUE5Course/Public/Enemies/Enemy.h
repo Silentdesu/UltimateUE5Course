@@ -121,9 +121,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> Weapon;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	AActor* CombatTarget;
-
 	UPROPERTY()
 	AAIController* AIController;
 

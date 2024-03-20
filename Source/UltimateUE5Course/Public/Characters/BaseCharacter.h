@@ -42,6 +42,12 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName) const;
 	void StopMontage(const UAnimMontage* Montage, const float& BlendOut = 0.0F) const;
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
+
 	/*
 	 * BlueprintCallables
 	 */
@@ -66,6 +72,12 @@ protected:
 
 protected:
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Combat")
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere)
+	double WarpTargetDistance = 75.0F;
+	
 	/*
 	 * Components
 	 */

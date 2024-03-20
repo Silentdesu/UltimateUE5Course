@@ -134,3 +134,19 @@ void ABaseCharacter::StopMontage(const UAnimMontage* Montage, const float& Blend
 	const float InBlendOut = BlendOut == 0.25F ? BlendOut : StopMontageBlendOut;
 	AnimInstance->Montage_Stop(InBlendOut, Montage);
 }
+
+FVector ABaseCharacter::GetTranslationWarpTarget()
+{
+	if (CombatTarget == nullptr) return FVector();
+
+	const FVector Target = CombatTarget->GetActorLocation();
+	const FVector Attacker = GetActorLocation();
+
+	const FVector Diff = (Attacker - Target).GetSafeNormal() * WarpTargetDistance;
+	return Target + Diff;
+}
+
+FVector ABaseCharacter::GetRotationWarpTarget()
+{
+	return CombatTarget == nullptr ? FVector() : CombatTarget->GetActorLocation();
+}
