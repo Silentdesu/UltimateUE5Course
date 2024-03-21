@@ -57,6 +57,13 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(ATTACK_ACTION, IE_Pressed, this, &ACourseCharacter::PerformAttack);
 }
 
+float ACourseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	ApplyDamage(DamageAmount);
+	return DamageAmount;
+}
+
 void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
 	Super::GetHit_Implementation(ImpactPoint, Attacker);
