@@ -64,6 +64,8 @@ protected:
 	void EquipWeapon(AWeapon* Weapon);
 	
 private:
+
+	void InitializeHUD();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -82,6 +84,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY()
+	class UGameplayWidget* GameplayWidget;
 
 	EActionState ActionState = EActionState::EAC_Unoccuppied;
 };

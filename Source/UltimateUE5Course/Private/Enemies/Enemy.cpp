@@ -208,7 +208,7 @@ void AEnemy::PerformAttack()
 void AEnemy::ApplyDamage(const float& Damage)
 {
 	Super::ApplyDamage(Damage);
-	WidgetComponent->SetHealth(AttributeComponent->GetPercentage());
+	WidgetComponent->SetHealth(AttributeComponent->GetHealthPercentage());
 }
 
 int32 AEnemy::PlayDeathMontage()

@@ -1,7 +1,10 @@
 #include "Characters/CourseCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Components/AttributeComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "HUD/GameplayWidget.h"
+#include "HUD/ProjectHUD.h"
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "UltimateUE5Course/Constants.h"
@@ -36,6 +39,7 @@ void ACourseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	Tags.Add(PLAYER_TAG);
+	InitializeHUD();
 }
 
 void ACourseCharacter::Tick(float DeltaTime)
@@ -178,4 +182,23 @@ void ACourseCharacter::EquipWeapon(AWeapon* Weapon)
 	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 	OverlappingItem = nullptr;
 	EquippedWeapon = Weapon;
+}
+
+void ACourseCharacter::InitializeHUD()
+{
+	if (const APlayerController* Player = Cast<APlayerController>(GetController()))
+	{
+		if (const AProjectHUD* ProjectHUD = Cast<AProjectHUD>(Player->GetHUD()))
+		{
+			GameplayWidget = ProjectHUD->GetGameplayWidget();
+
+			if (GameplayWidget && AttributeComponent)
+			{
+				GameplayWidget->SetHealthProgress(AttributeComponent->GetHealthPercentage());
+				GameplayWidget->SetStaminaProgress(1.0F);
+				GameplayWidget->SetGold(0);
+				GameplayWidget->SetSouls(0);
+			}
+		}
+	}
 }

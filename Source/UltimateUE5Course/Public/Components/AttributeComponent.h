@@ -20,7 +20,7 @@ public:
 	void ApplyHealthChange(const float& Delta);
 
 	FORCEINLINE
-	float GetPercentage() const { return Health / MaxHealth; }
+	float GetHealthPercentage() const { return Health / MaxHealth; }
 
 	FORCEINLINE
 	bool IsAlive() const { return Health > 0.0F; }
