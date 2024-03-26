@@ -45,12 +45,6 @@ void ACourseCharacter::BeginPlay()
 void ACourseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (GEngine)
-	{
-		FString Msg = FString(UEnum::GetValueAsString(ActionState));
-		GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Emerald, Msg);	
-	}
 }
 
 void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
