@@ -41,11 +41,18 @@ void ABaseCharacter::OnAttackEnd()
 
 void ABaseCharacter::PerformAttack()
 {
+	if (CombatTarget->ActorHasTag(DEAD_TAG))
+	{
+		CombatTarget = nullptr;
+		return;
+	}
+	
 	PlayAttackMontage();
 }
 
 void ABaseCharacter::Die()
 {
+	Tags.Add(DEAD_TAG);
 	PlayDeathMontage();
 }
 

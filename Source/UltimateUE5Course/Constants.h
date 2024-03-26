@@ -16,5 +16,6 @@ const FName HIT_REACT_FROM_LEFT = "FromLeft";
 const FName HIT_REACT_FROM_RIGHT = "FromRight";
 const FName PLAYER_TAG = "EngageableTarget";
 const FName ENEMY_TAG = "Enemy";
+const FName DEAD_TAG = "Dead";
 const FName ARM_STATE = "Arm";
 const FName DISARM_STATE = "Disarm";

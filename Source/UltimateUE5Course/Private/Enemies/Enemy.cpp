@@ -201,8 +201,10 @@ void AEnemy::SetMaxWalkSpeed(const float& NewSpeed) const
 
 void AEnemy::PerformAttack()
 {
-	ActionState = EEnemyState::EES_Engaged;
 	Super::PerformAttack();
+
+	if (CombatTarget == nullptr) return;
+	ActionState = EEnemyState::EES_Engaged;
 }
 
 void AEnemy::ApplyDamage(const float& Damage)
