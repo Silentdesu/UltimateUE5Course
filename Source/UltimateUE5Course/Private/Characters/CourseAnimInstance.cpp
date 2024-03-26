@@ -24,6 +24,8 @@ void UCourseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		Velocity = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 		bIsFalling = MovementComponent->IsFalling();
 		CharacterState = CourseCharacter->GetCharacterState();
+		ActionState = CourseCharacter->GetActionState();
+		DeathPose = CourseCharacter->GetDeathPose();
 	}
 }
 

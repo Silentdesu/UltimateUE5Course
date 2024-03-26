@@ -20,12 +20,14 @@ public:
 	ACourseCharacter();
 
 	virtual void Tick(float DeltaTime) override;
+	virtual void Jump() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
 
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void Arm();
@@ -37,16 +39,22 @@ public:
 	FORCEINLINE void SetUnoccupiedState();
 
 protected:
+	
 	virtual void BeginPlay() override;
+	virtual bool CanAttack() const override;
+	virtual void PerformAttack() override;
+	virtual void Die() override;
+	
+private:
 
 	void PerformVerticalInput(const float Value);
 	void PerformHorizontalInput(const float Value);
 	void PerformYawInput(const float Value);
 	void PerformPitchInput(const float Value);
-	void PerformJump();
 	void PerformEquip();
-	virtual bool CanAttack() const override;
-	virtual void PerformAttack() override;
+	void PlayEquipMontage(const FName& SectionName) const;
+	void EquipWeapon(AWeapon* Weapon);
+	void InitializeHUD();
 
 	FORCEINLINE FVector GetDirection(EAxis::Type type) const
 	{
@@ -59,13 +67,8 @@ protected:
 		CharacterState = State;
 		ActionState = EActionState::EAC_EquippingWeapon;
 	}
-
-	void PlayEquipMontage(const FName& SectionName) const;
-	void EquipWeapon(AWeapon* Weapon);
 	
-private:
-
-	void InitializeHUD();
+	FORCEINLINE bool IsUnoccupied() const { return ActionState == EActionState::EAC_Unoccuppied; }
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;

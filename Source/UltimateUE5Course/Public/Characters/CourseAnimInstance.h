@@ -31,4 +31,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement | Character State", meta = (AllowPrivateAccess = "true"))
 	ECharacterState CharacterState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement | Character State", meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement | Character State", meta = (AllowPrivateAccess = "true"))
+	TEnumAsByte<EDeathPose> DeathPose;
 };

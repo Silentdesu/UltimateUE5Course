@@ -44,7 +44,6 @@ protected:
 	virtual void Die() override;
 	virtual void PerformAttack() override;
 	virtual void ApplyDamage(const float& Damage) override;
-	virtual int32 PlayDeathMontage() override;
 	virtual void OnAttackEnd() override;
 
 	void OnPatrolState();
@@ -159,9 +158,6 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EEnemyState ActionState = EEnemyState::EES_Patrolling;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TEnumAsByte<EDeathPose> DeathPose;
 
 	FTimerHandle PatrolTimer;
 	FTimerHandle AttackTimer;

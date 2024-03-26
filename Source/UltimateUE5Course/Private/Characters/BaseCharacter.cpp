@@ -1,4 +1,6 @@
 #include "Characters/BaseCharacter.h"
+
+#include "Characters/CharacterTypes.h"
 #include "Components/AttributeComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -44,6 +46,7 @@ void ABaseCharacter::PerformAttack()
 
 void ABaseCharacter::Die()
 {
+	PlayDeathMontage();
 }
 
 void ABaseCharacter::ApplyDamage(const float& Damage)
@@ -95,6 +98,11 @@ void ABaseCharacter::SetCapsuleCollision(ECollisionEnabled::Type Type) const
 	GetCapsuleComponent()->SetCollisionEnabled(Type);
 }
 
+void ABaseCharacter::DisableMeshCollision() const
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 int32 ABaseCharacter::PlayRandomMontageBySections(UAnimMontage* Montage, const TArray<FName>& Sections) const
 {
 	if (Sections.Num() <= 0) return -1;
@@ -121,7 +129,14 @@ int32 ABaseCharacter::PlayAttackMontage() const
 
 int32 ABaseCharacter::PlayDeathMontage()
 {
-	return PlayRandomMontageBySections(DeathMontage, DeathMontageSections);
+	const int32 Idx = PlayRandomMontageBySections(DeathMontage, DeathMontageSections);
+	const TEnumAsByte<EDeathPose> Pose(Idx);
+	if (Pose < EDP_MAX)
+	{
+		DeathPose = Pose;
+	}
+
+	return Idx;
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName) const

@@ -117,9 +117,9 @@ void AEnemy::Die()
 {
 	if (ActionState == EEnemyState::EES_Dead) return;
 
+	Super::Die();
 	ActionState = EEnemyState::EES_Dead;
 	SetLifeSpan(DeathLifeSpan);
-	PlayDeathMontage();
 	SetHealthBarWidgetVisibility(false);
 	ClearTimer(AttackTimer);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -209,18 +209,6 @@ void AEnemy::ApplyDamage(const float& Damage)
 {
 	Super::ApplyDamage(Damage);
 	WidgetComponent->SetHealth(AttributeComponent->GetHealthPercentage());
-}
-
-int32 AEnemy::PlayDeathMontage()
-{
-	const int32 Idx = Super::PlayDeathMontage();
-	const TEnumAsByte<EDeathPose> Pose(Idx);
-	if (Pose < EDP_MAX)
-	{
-		DeathPose = Pose;
-	}
-
-	return Idx;
 }
 
 void AEnemy::OnAttackEnd()

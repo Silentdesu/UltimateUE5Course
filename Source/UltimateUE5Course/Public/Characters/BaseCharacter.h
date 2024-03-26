@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterTypes.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/Hitable.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,6 +21,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -30,6 +33,7 @@ protected:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
 	void GetDirectionalHit(const FVector& ImpactPoint) const;
 	void SetCapsuleCollision(ECollisionEnabled::Type Type) const;
+	void DisableMeshCollision() const;
 
 	/*
 	 * Montages
@@ -125,4 +129,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Death")
 	float DeathLifeSpan = 10.0F;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TEnumAsByte<EDeathPose> DeathPose;
 };

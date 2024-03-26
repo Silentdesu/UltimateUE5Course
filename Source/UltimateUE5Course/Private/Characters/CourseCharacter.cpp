@@ -45,6 +45,12 @@ void ACourseCharacter::BeginPlay()
 void ACourseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GEngine)
+	{
+		FString Msg = FString(UEnum::GetValueAsString(ActionState));
+		GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Emerald, Msg);	
+	}
 }
 
 void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -56,22 +62,32 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis(YAW_AXIS, this, &ACourseCharacter::PerformYawInput);
 	PlayerInputComponent->BindAxis(PITCH_AXIS, this, &ACourseCharacter::PerformPitchInput);
 
-	PlayerInputComponent->BindAction(JUMP_ACTION, IE_Pressed, this, &ACourseCharacter::PerformJump);
+	PlayerInputComponent->BindAction(JUMP_ACTION, IE_Pressed, this, &ACourseCharacter::Jump);
 	PlayerInputComponent->BindAction(EQUIP_ACTION, IE_Pressed, this, &ACourseCharacter::PerformEquip);
 	PlayerInputComponent->BindAction(ATTACK_ACTION, IE_Pressed, this, &ACourseCharacter::PerformAttack);
 }
 
 float ACourseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+                                   AActor* DamageCauser)
 {
 	ApplyDamage(DamageAmount);
+	GameplayWidget->SetHealthProgress(AttributeComponent->GetHealthPercentage());
 	return DamageAmount;
+}
+
+void ACourseCharacter::Jump()
+{
+	if (IsUnoccupied())
+	{
+		Super::Jump();
+	}
 }
 
 void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker)
 {
 	Super::GetHit_Implementation(ImpactPoint, Attacker);
-	ActionState = EActionState::EAC_HitReact;
+
+	if (AttributeComponent->IsAlive()) ActionState = EActionState::EAC_HitReact;
 	SetWeaponCollision(ECollisionEnabled::NoCollision);
 }
 
@@ -124,12 +140,6 @@ void ACourseCharacter::PerformPitchInput(const float Value)
 	AddControllerPitchInput(Value);
 }
 
-void ACourseCharacter::PerformJump()
-{
-	if (!Controller) return;
-	Jump();
-}
-
 void ACourseCharacter::PerformEquip()
 {
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
@@ -165,6 +175,14 @@ void ACourseCharacter::PerformAttack()
 
 	ActionState = EActionState::EAC_Attack;
 	Super::PerformAttack();
+}
+
+void ACourseCharacter::Die()
+{
+	Super::Die();
+
+	ActionState = EActionState::EAC_Dead;
+	DisableMeshCollision();
 }
 
 void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const
