@@ -136,11 +136,12 @@ void ACourseCharacter::PerformPitchInput(const float Value)
 
 void ACourseCharacter::PerformEquip()
 {
-	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
+	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
+	if (Weapon && EquippedWeapon == nullptr)
 	{
 		EquipWeapon(Weapon);
 	}
-	else
+	else if (EquippedWeapon)
 	{
 		const bool bCanArm = ActionState == EActionState::EAC_Unoccuppied &&
 			CharacterState == ECharacterState::ECS_Unequipped &&

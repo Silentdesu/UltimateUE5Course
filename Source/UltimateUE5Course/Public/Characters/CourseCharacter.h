@@ -25,10 +25,6 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
 
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
-	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
-	FORCEINLINE EActionState GetActionState() const { return ActionState; }
-
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void Arm();
 
@@ -37,6 +33,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetUnoccupiedState();
+
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 
 protected:
 	

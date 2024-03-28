@@ -59,7 +59,7 @@ protected:
 	AActor* Holder;
 
 	UPROPERTY(EditAnywhere)
-	class UNiagaraComponent* EmbersEffect;
+	class UNiagaraComponent* ItemEffect;
 
 	EItemState State = EItemState::EIS_Hovering;
 

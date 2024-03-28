@@ -37,7 +37,7 @@ protected:
 private:
 
 	void BoxTrace(FHitResult& HitResult);
-	void ExecuteGetHit(const FHitResult& HitResult);
+	void ExecuteGetHit(const FHitResult& HitResult) const;
 	
 	UPROPERTY(VisibleDefaultsOnly)
 	UBoxComponent* BoxComponent;

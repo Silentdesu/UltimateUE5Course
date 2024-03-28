@@ -41,7 +41,7 @@ void ABaseCharacter::OnAttackEnd()
 
 void ABaseCharacter::PerformAttack()
 {
-	if (CombatTarget->ActorHasTag(DEAD_TAG))
+	if (CombatTarget != nullptr && CombatTarget->ActorHasTag(DEAD_TAG))
 	{
 		CombatTarget = nullptr;
 		return;

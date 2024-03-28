@@ -42,9 +42,9 @@ void AWeapon::Equip(USceneComponent* Parent, FName InSocketName, AActor* NewOwne
 		SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
-	if (EmbersEffect)
+	if (ItemEffect)
 	{
-		EmbersEffect->Deactivate();
+		ItemEffect->Deactivate();
 	}
 }
 
@@ -99,7 +99,7 @@ void AWeapon::BoxTrace(FHitResult& HitResult)
 	IgnoreActors.AddUnique(HitResult.GetActor());
 }
 
-void AWeapon::ExecuteGetHit(const FHitResult& HitResult)
+void AWeapon::ExecuteGetHit(const FHitResult& HitResult) const
 {
 	if (IHitable* Hitable = Cast<IHitable>(HitResult.GetActor()))
 	{

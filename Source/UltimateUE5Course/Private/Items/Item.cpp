@@ -18,8 +18,8 @@ AItem::AItem()
 	SphereComponent->InitSphereRadius(300.0F);
 	SphereComponent->SetupAttachment(GetRootComponent());
 
-	EmbersEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EmbersEffect"));
-	EmbersEffect->SetupAttachment(GetRootComponent());
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EmbersEffect"));
+	ItemEffect->SetupAttachment(GetRootComponent());
 }
 
 void AItem::BeginPlay()
@@ -38,7 +38,7 @@ void AItem::Tick(float DeltaTime)
 
 	if (State == EItemState::EIS_Hovering)
 	{
-		AddActorWorldOffset(FVector(0.0F, 0.0F, TransformSin(DeltaTime)));
+		AddActorWorldOffset(FVector(0.0F, 0.0F, TransformSin(RunningTime)));
 	}
 }
 
