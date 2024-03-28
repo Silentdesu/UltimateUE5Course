@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "CharacterTypes.h"
+#include "Interfaces/PickUp.h"
 #include "CourseCharacter.generated.h"
 
 class USpringArmComponent;
@@ -12,7 +13,7 @@ class AWeapon;
 class UAnimMontage;
 
 UCLASS()
-class ULTIMATEUE5COURSE_API ACourseCharacter : public ABaseCharacter
+class ULTIMATEUE5COURSE_API ACourseCharacter : public ABaseCharacter, public IPickUp
 {
 	GENERATED_BODY()
 
@@ -24,6 +25,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
+	virtual void SetOverlappingItem(AItem* Item) override { OverlappingItem = Item; }
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void Arm();
@@ -34,7 +36,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetUnoccupiedState();
 
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 
