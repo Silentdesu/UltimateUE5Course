@@ -24,6 +24,18 @@ public:
 
 	FORCEINLINE
 	bool IsAlive() const { return Health > 0.0F; }
+
+	FORCEINLINE
+	void SetGold(const int32& Value) { Gold += Value; }
+
+	FORCEINLINE
+	int32 GetGold() const { return Gold; }
+
+	FORCEINLINE
+	void SetSouls(const int32& Value) { Souls += Value; }
+	
+	FORCEINLINE
+	int32 GetSouls() const { return Souls; }
 	
 protected:
 	
@@ -36,5 +48,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
 	float MaxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
+	int32 Gold;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
+	int32 Souls;
 };

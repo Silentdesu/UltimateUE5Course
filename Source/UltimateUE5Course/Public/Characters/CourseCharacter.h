@@ -26,6 +26,8 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Attacker) override;
 	virtual void SetOverlappingItem(AItem* Item) override { OverlappingItem = Item; }
+	virtual void AddSoul(ASoul* Soul) override;
+	virtual void AddGold(ATreasure* Treasure) override;
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void Arm();

@@ -17,4 +17,6 @@ class ULTIMATEUE5COURSE_API IPickUp
 public:
 
 	virtual void SetOverlappingItem(class AItem* Item);
+	virtual void AddSoul(class ASoul* Soul);
+	virtual void AddGold(class ATreasure* Treasure);
 };

@@ -6,6 +6,8 @@
 #include "HUD/GameplayWidget.h"
 #include "HUD/ProjectHUD.h"
 #include "Items/Item.h"
+#include "Items/Pickups/Soul.h"
+#include "Items/Pickups/Treasure.h"
 #include "Items/Weapons/Weapon.h"
 #include "UltimateUE5Course/Constants.h"
 
@@ -83,6 +85,18 @@ void ACourseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor*
 
 	if (AttributeComponent->IsAlive()) ActionState = EActionState::EAC_HitReact;
 	SetWeaponCollision(ECollisionEnabled::NoCollision);
+}
+
+void ACourseCharacter::AddSoul(ASoul* Soul)
+{
+	AttributeComponent->SetSouls(Soul->GetSouls());
+	GameplayWidget->SetSouls(AttributeComponent->GetSouls());
+}
+
+void ACourseCharacter::AddGold(ATreasure* Treasure)
+{
+	AttributeComponent->SetGold(Treasure->GetGold());
+	GameplayWidget->SetGold(AttributeComponent->GetGold());
 }
 
 void ACourseCharacter::Arm()

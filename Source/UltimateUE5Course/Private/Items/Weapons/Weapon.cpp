@@ -32,10 +32,7 @@ void AWeapon::Equip(USceneComponent* Parent, FName InSocketName, AActor* NewOwne
 	Holder = Parent->GetAttachParentActor();
 	State = EItemState::EIS_Equipped;
 
-	if (EquipSFX)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, EquipSFX, GetActorLocation());
-	}
+	SpawnEquipSFX();
 
 	if (SphereComponent)
 	{

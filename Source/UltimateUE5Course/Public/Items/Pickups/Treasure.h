@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,6 +9,11 @@ class ULTIMATEUE5COURSE_API ATreasure : public AItem
 {
 	GENERATED_BODY()
 
+public:
+
+	FORCEINLINE
+	int32 GetGold() const { return Gold; }
+	
 protected:
 	
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -18,9 +21,6 @@ protected:
 	                                  const FHitResult& SweepResult) override;
 
 private:
-
-	UPROPERTY(EditAnywhere, Category = "Sounds")
-	USoundBase* PickupSound;
 
 	UPROPERTY(EditAnywhere, Category = "Economy")
 	int32 Gold;

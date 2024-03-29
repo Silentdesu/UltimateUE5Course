@@ -6,6 +6,8 @@
 
 class USphereComponent;
 class USoundBase;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 enum class EItemState : int8
 {
@@ -38,6 +40,11 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void SpawnPickUpVFX() const;
+	void SpawnPickUpSFX() const;
+	void SpawnEquipSFX() const;
+	
 protected:
 
 	UPROPERTY(Category= "Sine Parameters", EditAnywhere, BlueprintReadWrite)
@@ -52,18 +59,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComponent;
 
-	UPROPERTY(EditDefaultsOnly)
-	USoundBase* EquipSFX;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AActor* Holder;
 
-	UPROPERTY(EditAnywhere)
-	class UNiagaraComponent* ItemEffect;
+	UPROPERTY(EditAnywhere, Category = VFX)
+	UNiagaraComponent* ItemEffect;
 
 	EItemState State = EItemState::EIS_Hovering;
 
 private:
+
+	UPROPERTY(EditAnywhere, Category = VFX)
+	UNiagaraSystem* PickUpVFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = SFX)
+	USoundBase* EquipSFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = SFX)
+	USoundBase* PickUpSFX;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime;

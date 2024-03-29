@@ -3,6 +3,7 @@
 #include "Characters/CourseCharacter.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 AItem::AItem()
 {
@@ -65,6 +66,30 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (IPickUp* Character = Cast<IPickUp>(OtherActor))
 	{
 		Character->SetOverlappingItem(nullptr);
+	}
+}
+
+void AItem::SpawnPickUpVFX() const
+{
+	if (PickUpVFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickUpVFX, GetActorLocation());
+	}
+}
+
+void AItem::SpawnPickUpSFX() const
+{
+	if (PickUpSFX)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, PickUpSFX, GetActorLocation());
+	}
+}
+
+void AItem::SpawnEquipSFX() const
+{
+	if (EquipSFX)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, EquipSFX, GetActorLocation());
 	}
 }
 
