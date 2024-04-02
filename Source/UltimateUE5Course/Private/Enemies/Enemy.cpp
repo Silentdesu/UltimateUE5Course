@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Items/Pickups/Soul.h"
 #include "Items/Weapons/Weapon.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
@@ -125,7 +126,9 @@ void AEnemy::Die()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetCapsuleCollision(ECollisionEnabled::NoCollision);
 	SetWeaponCollision(ECollisionEnabled::NoCollision);
+	SpawnSoul();
 }
+
 
 AActor* AEnemy::GetPatrolTarget()
 {
@@ -197,6 +200,18 @@ void AEnemy::OnAgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
 void AEnemy::SetMaxWalkSpeed(const float& NewSpeed) const
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+}
+
+void AEnemy::SpawnSoul() const
+{
+	UWorld* World = GetWorld();
+	if (World && SoulClass)
+	{
+		if (ASoul* Soul = World->SpawnActor<ASoul>(SoulClass, GetActorLocation(), GetActorRotation()))
+		{
+			Soul->SetSouls(AttributeComponent->GetSouls());
+		}
+	}
 }
 
 void AEnemy::PerformAttack()

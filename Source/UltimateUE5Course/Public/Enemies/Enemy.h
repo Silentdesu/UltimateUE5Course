@@ -6,6 +6,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "Enemy.generated.h"
 
+class ASoul;
 class UPawnSensingComponent;
 class AAIController;
 class USphereComponent;
@@ -52,6 +53,7 @@ protected:
 	void MoveTo(const AActor* Target, const float& AcceptanceRadius = 15.0F) const;
 	void OnPatrolTimerFinished() const;
 	void SetMaxWalkSpeed(const float& NewSpeed) const;
+	void SpawnSoul() const;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* SeenPawn);
@@ -108,6 +110,7 @@ private:
 	FORCEINLINE void ClearTimer(FTimerHandle& TimerHandle) const { GetWorldTimerManager().ClearTimer(TimerHandle); }
 
 private:
+	
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereComponent;
 
@@ -155,6 +158,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AttackMax = 1.0F;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<ASoul> SoulClass;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EEnemyState ActionState = EEnemyState::EES_Patrolling;
