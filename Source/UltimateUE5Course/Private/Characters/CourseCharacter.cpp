@@ -47,6 +47,9 @@ void ACourseCharacter::BeginPlay()
 void ACourseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AttributeComponent->RegenStamina(DeltaTime);
+	GameplayWidget->SetStaminaProgress(AttributeComponent->GetStaminaPercentage());
 }
 
 void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -61,6 +64,7 @@ void ACourseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(JUMP_ACTION, IE_Pressed, this, &ACourseCharacter::Jump);
 	PlayerInputComponent->BindAction(EQUIP_ACTION, IE_Pressed, this, &ACourseCharacter::PerformEquip);
 	PlayerInputComponent->BindAction(ATTACK_ACTION, IE_Pressed, this, &ACourseCharacter::PerformAttack);
+	PlayerInputComponent->BindAction(DODGE_ACTION, IE_Pressed, this, &ACourseCharacter::PerformDodge);
 }
 
 float ACourseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -172,6 +176,17 @@ void ACourseCharacter::PerformEquip()
 	}
 }
 
+void ACourseCharacter::PerformDodge()
+{
+	if (!IsUnoccupied() || !HasEnoughStamina()) return;
+	
+	PlayMontageSection(DodgeMontage, DEFAULT_MONTAGE_SECTION);
+	ActionState = EActionState::EAC_Dodge;
+
+	AttributeComponent->UseStamina(AttributeComponent->GetDodgeCost());
+	GameplayWidget->SetStaminaProgress(AttributeComponent->GetStaminaPercentage());
+}
+
 bool ACourseCharacter::CanAttack() const
 {
 	return ActionState == EActionState::EAC_Unoccuppied && CharacterState !=
@@ -198,8 +213,9 @@ void ACourseCharacter::PlayEquipMontage(const FName& SectionName) const
 {
 	if (EquipMontage)
 	{
-		AnimInstance->Montage_Play(EquipMontage);
-		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+		PlayMontageSection(EquipMontage, SectionName);
+		// AnimInstance->Montage_Play(EquipMontage);
+		// AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
 	}
 }
 

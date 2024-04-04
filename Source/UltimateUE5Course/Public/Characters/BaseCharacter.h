@@ -112,6 +112,9 @@ protected:
 	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* DodgeMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	TArray<FName> DeathMontageSections;
 
 	UPROPERTY(EditAnywhere, Category = "Montages")

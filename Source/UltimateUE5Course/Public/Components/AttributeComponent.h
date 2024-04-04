@@ -12,15 +12,23 @@ class ULTIMATEUE5COURSE_API UAttributeComponent : public UActorComponent
 public:
 	
 	UAttributeComponent();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 
 	FORCEINLINE
-	void ApplyHealthChange(const float& Delta);
+	void ApplyHealthChange(const float& Delta) { Health = FMath::Clamp(Health - Delta, 0.0f, MaxHealth); }
+
+	FORCEINLINE
+	void UseStamina(const float& Delta) { Stamina = FMath::Clamp(Stamina - Delta, 0.0f, MaxStamina); }
+
+	FORCEINLINE
+	void RegenStamina(const float& DeltaTime) { Stamina = FMath::Clamp(Stamina + StaminaRegenRate * DeltaTime, 0, MaxStamina); }
 
 	FORCEINLINE
 	float GetHealthPercentage() const { return Health / MaxHealth; }
+
+	FORCEINLINE
+	float GetStaminaPercentage() const { return Stamina / MaxStamina; }
 
 	FORCEINLINE
 	bool IsAlive() const { return Health > 0.0F; }
@@ -36,6 +44,12 @@ public:
 	
 	FORCEINLINE
 	int32 GetSouls() const { return Souls; }
+
+	FORCEINLINE
+	float GetStamina() const { return Stamina; }
+
+	FORCEINLINE
+	float GetDodgeCost() const { return DodgeCost; }
 	
 protected:
 	
@@ -48,6 +62,18 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
 	float MaxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
+	float Stamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
+	float MaxStamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
+	float StaminaRegenRate = 2.0F;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
+	float DodgeCost = 14.0F;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actor Properties", meta = (AllowPrivateAccess = "true"))
 	int32 Gold;

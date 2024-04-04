@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "CharacterTypes.h"
+#include "Components/AttributeComponent.h"
 #include "Interfaces/PickUp.h"
 #include "CourseCharacter.generated.h"
 
@@ -55,6 +56,7 @@ private:
 	void PerformYawInput(const float Value);
 	void PerformPitchInput(const float Value);
 	void PerformEquip();
+	void PerformDodge();
 	void PlayEquipMontage(const FName& SectionName) const;
 	void EquipWeapon(AWeapon* Weapon);
 	void InitializeHUD();
@@ -72,6 +74,8 @@ private:
 	}
 	
 	FORCEINLINE bool IsUnoccupied() const { return ActionState == EActionState::EAC_Unoccuppied; }
+
+	FORCEINLINE bool HasEnoughStamina() const { return AttributeComponent->GetStamina() > AttributeComponent->GetDodgeCost(); }
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
